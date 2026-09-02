@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Upload</title>
+    <style>
+        .top-header {
+            background: linear-gradient(90deg, #3e70d6, #4b8bff);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        .top-header img.logo {
+            height: 55px;
+        }
+
+        .top-header .title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .top-header .spacer {
+            width: 55px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .page-content {
+            min-height: calc(100vh - 85px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+
+        .file-label:hover {
+            background: #eef1ff;
+            border-color: #764ba2;
+        }
+
+        .file-label-text {
+            text-align: center;
+            color: #667eea;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #333;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <img src="/static/logo.png" class="logo" alt="ChakoraHub">
+        <div class="title">Resume Upload</div>
+        <div class="spacer"></div>
+    </div>
+
+    <div class="page-content">
+    <div class="container">
+        <h1>Upload Your Resume</h1>
+        <p class="subtitle">Submit your resume and we'll get back to you soon</p>
+        
+        <form id="resumeForm">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" name="phone">
+        </div>
+
+        <div class="form-group">
+            <label for="experience_years">Years of Experience *</label>
+            <input type="text" id="experience_years" name="experience_years" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qualification">Highest Qualification *</label>
+            <select id="qualification" name="qualification" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;">
+                <option value="">-- Select --</option>
+                <option value="B.Tech">B.Tech</option>
+                <option value="M.Tech">M.Tech</option>
+                <option value="B.Sc">B.Sc</option>
+                <option value="B.Com">B.Com</option>
+                <option value="BBA">BBA</option>
+                <option value="MBA">MBA</option>
+                <option value="M.Sc">M.Sc</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="source">From where did you know about the job posting / company? *</label>
+            <select id="source" name="source" required style="width:100%;padding:12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;">
+                <option value="">-- Select --</option>
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Naukri">Naukri</option>
+                <option value="Indeed">Indeed</option>
+                <option value="Referral">Referral</option>
+                <option value="Website">Website</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+            <div class="form-group">
+                <label>Resume (PDF, DOC, DOCX) *</label>
+                <div class="file-upload">
+                    <input type="file" id="resume" name="resume" class="file-input" accept=".pdf,.doc,.docx" required>
+                    <label for="resume" class="file-label">
+                        <div>
+                            <div class="file-icon">📄</div>
+                            <div class="file-label-text">
+                                <strong>Click to upload</strong> or drag and drop<br>
+                                <small>PDF, DOC, or DOCX (Max 10MB)</small>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+                <div class="file-name" id="fileName"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Submit Resume</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #667eea;">Uploading...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+    </div>
+
+    <script>
+const API_BASE_URL = '';
+
+const form = document.getElementById('resumeForm');
+const fileInput = document.getElementById('resume');
+const fileName = document.getElementById('fileName');
+const submitBtn = document.getElementById('submitBtn');
+const loading = document.getElementById('loading');
+const message = document.getElementById('message');
+
+// File input change handler
+fileInput.addEventListener('change', function(e) {
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        fileName.textContent = `Selected: ${file.name}`;
+    }
+});
+
+// Form submission handler
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const file = fileInput.files[0];
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const experience_years = parseFloat(document.getElementById('experience_years').value) || 0;
+    const qualification = document.getElementById('qualification').value;
+    const source = document.getElementById('source').value;
+
+    // Validate file size
+    if (file.size > 10 * 1024 * 1024) {
+        showMessage('File size must be less than 10MB', 'error');
+        return;
+    }
+
+    // Show loading
+    submitBtn.disabled = true;
+    loading.style.display = 'block';
+    message.style.display = 'none';
+
+    // Read file as binary
+    const fileReader = new FileReader();
+    
+    fileReader.onload = async function(e) {
+        try {
+            // Base64 encode
+            const base64Data = btoa(e.target.result);
+            
+            // Create payload
+            const payload = JSON.stringify({
+                name: name,
+                email: email,
+                phone: phone,
+                experience_years: experience_years,
+                qualification: qualification,
+                source: source,
+                filename: file.name,
+                resume: base64Data
+            });
+
+            // Send to API
+            const response = await fetch('/api/onboarding/upload-resume', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: payload
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showMessage(`Resume uploaded successfully! Your Application ID: ${result.application_id}`, 'success');
+                form.reset();
+                fileName.textContent = '';
+            } else {
+                showMessage(result.message || 'Upload failed. Please try again.', 'error');
+            }
+        } catch (error) {
+            showMessage('An error occurred. Please try again later.', 'error');
+            console.error('Error:', error);
+        } finally {
+            submitBtn.disabled = false;
+            loading.style.display = 'none';
+        }
+    };
+
+    // IMPORTANT: Trigger file read
+    fileReader.readAsBinaryString(file);
+});
+
+function showMessage(text, type) {
+    message.textContent = text;
+    message.className = `message ${type}`;
+    message.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

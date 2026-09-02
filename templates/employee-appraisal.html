@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Appraisal System - ChakoraHub</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #2d3748;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px 40px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: rgba(255,255,255,0.15);
+      padding: 10px 20px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header .user-info img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      border: 3px solid white;
+      object-fit: cover;
+    }
+
+    .main-container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: flex;
+      gap: 25px;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .sidebar h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .sidebar-item {
+      padding: 14px 18px;
+      margin: 8px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      color: #4a5568;
+    }
+
+    .sidebar-item:hover {
+      background: #f7fafc;
+      transform: translateX(5px);
+      color: #667eea;
+    }
+
+    .sidebar-item.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .content-area {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 35px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      min-height: 600px;
+    }
+
+    .content-section {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 30px;
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .section-header h2 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .section-header p {
+      opacity: 0.95;
+      font-size: 1.05rem;
+    }
+
+    .info-card {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 5px solid #667eea;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+
+    .info-card h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #4a5568;
+    }
+
+    .info-value {
+      color: #2d3748;
+      font-weight: 500;
+    }
+
+    .rating-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 15px;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 16px;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+    }
+
+    .data-table tbody tr {
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background: #f7fafc;
+    }
+
+    .data-table tbody tr:hover {
+      background: #edf2f7;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .reportee-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 5px solid #667eea;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .reportee-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .reportee-card h4 {
+      color: #667eea;
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .reportee-card p {
+      margin: 8px 0;
+      color: #4a5568;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+      margin-right: 10px;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(72, 187, 120, 0.6);
+    }
+
+    .btn-cancel {
+      background: #e2e8f0;
+      color: #4a5568;
+    }
+
+    .btn-cancel:hover {
+      background: #cbd5e0;
+    }
+
+    .appraisal-form {
+      background: #f7fafc;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    .appraisal-form h3 {
+      color: #667eea;
+      margin-bottom: 25px;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      color: #718096;
+      font-size: 1.1rem;
+    }
+
+    .notification {
+      padding: 16px 24px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .notification.success {
+      background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+      color: #22543d;
+    }
+
+    .notification.error {
+      background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%);
+      color: #742a2a;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      min-width: 400px;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalSlideIn 0.3s ease;
+    }
+
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-content h3 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 40px;
+      color: #718096;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #4a5568;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .status-badge.completed {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+
+    .status-badge.planned {
+      background: #feebc8;
+      color: #7c2d12;
+    }
+    
+    .warning-message {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #856404;
+    }
+    
+    .warning-message h3 {
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+
+    /* ── Org Hierarchy ── */
+    .hier-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .hier-stat-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .hier-stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+    .hier-stat-val { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+    .hier-stat-lbl { font-size: .8rem; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+
+    .hier-chain {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 18px;
+      background: #f7fafc;
+      border-radius: 14px;
+      overflow-x: auto;
+    }
+    .hier-node {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 11px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+      transition: all .25s;
+      cursor: default;
+    }
+    .hier-node:hover { border-color: #667eea; box-shadow: 0 4px 16px rgba(102,126,234,.18); transform: translateY(-2px); }
+    .hier-node.you {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      border-color: #667eea;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(102,126,234,.35);
+    }
+    .hier-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .hier-node.you .hier-avatar { background: rgba(255,255,255,.25); }
+    .hier-node-name { font-size: 13px; font-weight: 700; color: #1e293b; }
+    .hier-node.you .hier-node-name { color: #fff; }
+    .hier-node-sub  { font-size: 11px; color: #718096; margin-top: 1px; }
+    .hier-node.you .hier-node-sub { color: rgba(255,255,255,.8); }
+    .hier-arrow { font-size: 20px; color: #a0aec0; flex-shrink: 0; }
+    .hier-badge {
+      position: absolute; top: -9px; right: -9px;
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 8px; color: #fff;
+    }
+    .hier-badge.ceo  { background: #ef4444; }
+    .hier-badge.you  { background: #10b981; }
+
+    .hier-rep-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .hier-rep-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      transition: all .25s;
+    }
+    .hier-rep-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(102,126,234,.15); border-color: #667eea; }
+    .hier-rep-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .hier-rep-av {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg,#3b82f6,#1d4ed8);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .hier-rep-name { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .hier-rep-id   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .hier-rep-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #f1f5f9; margin-top: 2px; }
+    .hier-rep-dept { font-size: 12px; color: #64748b; }
+    .hier-rep-lvl  { font-size: 11px; font-weight: 700; color: #667eea; background: rgba(102,126,234,.1); padding: 3px 10px; border-radius: 8px; }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin-top: 40px;
+      font-size: 0.95rem;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎯 Employee Appraisal System</h1>
+  <div class="user-info">
+    <img id="headerProfilePic" src="{{ employee_profile_pic or 'https://chakorahub-student-s3.s3.eu-north-1.amazonaws.com/defaultpicture.jpg' }}" alt="Profile" onerror="this.src='https://chakorahub-student-s3.s3.eu-north-1.amazonaws.com/defaultpicture.jpg'" style="width:45px;height:45px;border-radius:50%;border:3px solid white;object-fit:cover;" />
+    <div>
+      <div id="userName" style="font-weight: 700; font-size: 1.1rem;">Loading...</div>
+      <div id="userRole" style="font-size: 0.85rem; opacity: 0.9;">Employee ID: <span id="userEmployeeId">---</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-container">
+  <div class="sidebar">
+    <h3>📊 Appraisal</h3>
+    <div class="sidebar-item active" onclick="showSection('my-appraisal')" data-section="my-appraisal">
+      📋 My Appraisal
+    </div>
+    <div class="sidebar-item" onclick="showSection('appraise-reportees')" data-section="appraise-reportees">
+      👥 Appraise Reportees
+    </div>
+    <div class="sidebar-item" onclick="showSection('view-hierarchy')" data-section="view-hierarchy">
+      🏢 Organization Hierarchy
+    </div>
+    <div class="sidebar-item" onclick="showSection('view-appraisals')" data-section="view-appraisals">
+      📈 Team Appraisals
+    </div>
+    
+    <h3 style="margin-top: 30px;">⚙️ Manage</h3>
+    <div class="sidebar-item" onclick="showSection('manage-goals')" data-section="manage-goals">
+      🎯 My Goals
+    </div>
+    <div class="sidebar-item" onclick="showSection('manage-trainings')" data-section="manage-trainings">
+      📚 My Trainings
+    </div>
+  </div>
+
+  <div class="content-area" id="mainContent">
+    <!-- My Appraisal Section -->
+    <div id="my-appraisal" class="content-section active">
+      <div class="section-header">
+        <h2>📊 My Performance Appraisal</h2>
+        <p>Comprehensive view of your performance, goals, and development</p>
+      </div>
+      <div id="my-appraisal-content">
+        <div class="loading">⏳ Loading your appraisal data...</div>
+      </div>
+    </div>
+
+    <!-- Appraise Reportees Section -->
+    <div id="appraise-reportees" class="content-section">
+      <div class="section-header">
+        <h2>👥 Appraise Your Team</h2>
+        <p>Evaluate and provide feedback to your direct reportees</p>
+      </div>
+      <div id="reportees-list">
+        <div class="loading">⏳ Loading team members...</div>
+      </div>
+    </div>
+
+    <!-- View Hierarchy Section -->
+    <div id="view-hierarchy" class="content-section">
+      <div class="section-header">
+        <h2>🏢 Organization Hierarchy</h2>
+        <p>Your reporting chain, direct reportees and full team structure</p>
+      </div>
+
+      <!-- Stats row -->
+      <div class="hier-stats" id="hierStats" style="display:none;">
+        <div class="hier-stat-card">
+          <div class="hier-stat-val" id="hierDirect">—</div>
+          <div class="hier-stat-lbl">Direct Reportees</div>
+        </div>
+        <div class="hier-stat-card">
+          <div class="hier-stat-val" id="hierTotal">—</div>
+          <div class="hier-stat-lbl">Total Reportees</div>
+        </div>
+        <div class="hier-stat-card">
+          <div class="hier-stat-val" id="hierLevel">—</div>
+          <div class="hier-stat-lbl">Your Level</div>
+        </div>
+      </div>
+
+      <!-- Supervisor chain -->
+      <div class="info-card" style="border-left-color:#667eea;">
+        <h3>⬆️ My Reporting Chain (Supervisors)</h3>
+        <div id="supervisors-list">
+          <div class="loading">⏳ Loading reporting chain…</div>
+        </div>
+      </div>
+
+      <!-- Direct reportees -->
+      <div class="info-card" style="border-left-color:#3b82f6;">
+        <h3>⬇️ My Team (Direct Reportees)</h3>
+        <div id="hierarchy-reportees-list">
+          <div class="loading">⏳ Loading team…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Appraisals Section -->
+    <div id="view-appraisals" class="content-section">
+      <div class="section-header">
+        <h2>📈 Team Performance Overview</h2>
+        <p>Appraisals of all team members under your supervision</p>
+      </div>
+      <div id="viewable-appraisals-list">
+        <div class="loading">⏳ Loading appraisals...</div>
+      </div>
+    </div>
+
+    <!-- Manage Goals Section -->
+    <div id="manage-goals" class="content-section">
+      <div class="section-header">
+        <h2>🎯 My Goals & Objectives</h2>
+        <p>Track and manage your professional goals</p>
+      </div>
+      <button class="btn btn-primary" onclick="showAddGoalForm()">➕ Add New Goal</button>
+      <div id="goals-list" style="margin-top: 25px;">
+        <div class="loading">⏳ Loading goals...</div>
+      </div>
+    </div>
+
+    <!-- Manage Trainings Section -->
+    <div id="manage-trainings" class="content-section">
+      <div class="section-header">
+        <h2>📚 My Trainings & Development</h2>
+        <p>Track your learning and professional development</p>
+      </div>
+      <button class="btn btn-primary" onclick="showAddTrainingForm()">➕ Add Training</button>
+      <div id="trainings-list" style="margin-top: 25px;">
+        <div class="loading">⏳ Loading trainings...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 ChakoraHub. All rights reserved. | Employee Performance Management System
+</footer>
+
+<!-- Modal for Appraisal Form -->
+<div id="appraisalModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Modal Title</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  let EMPLOYEE_ID = "{{ employee_id }}";
+  const IS_MANAGER = "{{ is_manager }}".toLowerCase() === "true";
+
+  console.log("Employee ID from template:", EMPLOYEE_ID);
+  console.log("Is Manager:", IS_MANAGER);
+  const API_BASE = "";  // Use relative URLs — routes through Flask proxy (fixes Failed to fetch)
+  
+  let currentEmployeeInfo = null;
+  
+document.addEventListener('DOMContentLoaded', function () {
+  // Sync template variable to localStorage for the logic to work
+  localStorage.setItem("is_manager", IS_MANAGER); 
+
+  if (IS_MANAGER && appraiseMenu) {
+    const appraiseMenu = document.querySelector('[data-section="appraise-reportees"]');
+
+  }
+
+  loadMyAppraisal();
+});
+  
+function updateHeaderInfo(employeeInfo) {
+  if (!employeeInfo) return;
+
+  const empName = employeeInfo.EMPLOYEE_NAME || 'Employee';
+  const empId = employeeInfo.EMPLOYEE_ID || '---';
+  const designation = employeeInfo.DESIGNATION || 'N/A';
+  const dept = employeeInfo.DEPT_NAME || 'N/A';
+
+  const userNameEl = document.getElementById('userName');
+  const userRoleEl = document.getElementById('userRole');
+  // FIX: Define the missing element reference
+  const userEmpIdEl = document.getElementById('userEmployeeId'); 
+
+  if (userNameEl) userNameEl.textContent = empName;
+  if (userEmpIdEl) userEmpIdEl.textContent = empId; // Now this won't crash
+  if (userRoleEl) userRoleEl.innerHTML = `${designation}, ${dept}`;
+}
+
+  function showSection(sectionId) {
+    document.querySelectorAll('.content-section').forEach(section => {
+      section.classList.remove('active');
+    });
+    
+    document.getElementById(sectionId).classList.add('active');
+    
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('data-section') === sectionId) {
+        item.classList.add('active');
+      }
+    });
+    
+    switch(sectionId) {
+      case 'my-appraisal': loadMyAppraisal(); break;
+      case 'appraise-reportees': loadReportees(); break;
+      case 'view-hierarchy': loadHierarchy(); break;
+      case 'view-appraisals': loadViewableAppraisals(); break;
+      case 'manage-goals': loadGoals(); break;
+      case 'manage-trainings': loadTrainings(); break;
+    }
+  }
+  
+  async function loadMyAppraisal() {
+    console.log('Loading appraisal for:', EMPLOYEE_ID);
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/employee/${EMPLOYEE_ID}`);
+      console.log('Response status:', response.status);
+      
+      const data = await response.json();
+      console.log('Received data:', data);
+      
+      if (data.success) {
+        currentEmployeeInfo = data.employee_info;
+        updateHeaderInfo(data.employee_info);
+        displayMyAppraisal(data);
+      } else {
+        showNotification('Failed to load appraisal data', 'error');
+      }
+    } catch (error) {
+      console.error('Error loading appraisal:', error);
+      showNotification('Error loading appraisal data: ' + error.message, 'error');
+    }
+  }
+  
+  function displayMyAppraisal(data) {
+    const container = document.getElementById('my-appraisal-content');
+    
+    let html = '';
+    
+    html += '<div class="info-card">';
+    html += '<h3>👤 Employee Information</h3>';
+    if (data.employee_info) {
+      html += `<div class="info-row"><span class="info-label">Name:</span><span class="info-value">${data.employee_info.EMPLOYEE_NAME || 'N/A'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Employee ID:</span><span class="info-value">${data.employee_info.EMPLOYEE_ID || 'N/A'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Email:</span><span class="info-value">${data.employee_info.EMAIL || 'N/A'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Department:</span><span class="info-value">${data.employee_info.DEPT_NAME || 'N/A'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Designation:</span><span class="info-value">${data.employee_info.DESIGNATION || 'N/A'}</span></div>`;
+    } else {
+      html += '<p style="color: #718096;">No employee information available</p>';
+    }
+    html += '</div>';
+    
+    html += '<div class="info-card">';
+    html += '<h3>⭐ Latest Performance Rating</h3>';
+    if (data.summary) {
+      html += `<div class="info-row"><span class="info-label">Rating:</span><span class="rating-badge">${data.summary.FINAL_RATING}/5.0</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Comments:</span><span class="info-value">${data.summary.COMMENTS || 'No comments'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Appraisal Date:</span><span class="info-value">${data.summary.APPRAISAL_DATE ? new Date(data.summary.APPRAISAL_DATE).toLocaleDateString() : 'N/A'}</span></div>`;
+      html += `<div class="info-row"><span class="info-label">Appraised By:</span><span class="info-value">${data.summary.SUBMITTED_BY || 'N/A'}</span></div>`;
+    } else {
+      html += '<div class="empty-state"><h3>No appraisal recorded yet</h3><p>Your manager will provide feedback soon</p></div>';
+    }
+    html += '</div>';
+    
+    html += '<div class="info-card">';
+    html += '<h3>🎯 Current Goals</h3>';
+    if (data.goals && data.goals.length > 0) {
+      html += '<table class="data-table"><thead><tr><th>Goal</th><th>Target Date</th><th>Status</th></tr></thead><tbody>';
+      data.goals.forEach(goal => {
+        const statusClass = goal.STATUS && goal.STATUS.toLowerCase() === 'completed' ? 'completed' : 'planned';
+        html += `<tr>
+          <td>${goal.GOAL_DESCRIPTION || 'N/A'}</td>
+          <td>${goal.TARGET_DATE || 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${goal.STATUS || 'N/A'}</span></td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<div class="empty-state"><p>No goals set yet</p></div>';
+    }
+    html += '</div>';
+    
+    html += '<div class="info-card">';
+    html += '<h3>📚 Training History</h3>';
+    if (data.trainings && data.trainings.length > 0) {
+      html += '<table class="data-table"><thead><tr><th>Training</th><th>Completion Date</th><th>Status</th></tr></thead><tbody>';
+      data.trainings.forEach(training => {
+        const statusClass = training.STATUS && training.STATUS.toLowerCase() === 'completed' ? 'completed' : 'planned';
+        html += `<tr>
+          <td>${training.TRAINING_NAME || 'N/A'}</td>
+          <td>${training.COMPLETION_DATE || 'N/A'}</td>
+          <td><span class="status-badge ${statusClass}">${training.STATUS || 'N/A'}</span></td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<div class="empty-state"><p>No trainings recorded yet</p></div>';
+    }
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+  
+ async function loadReportees() {
+  console.log("Loading reportees for:", EMPLOYEE_ID);
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/appraisal/reportees/${EMPLOYEE_ID}`
+    );
+
+    const data = await response.json();
+
+    console.log("Reportees response:", data);
+
+    // ✅ Eligibility based ONLY on data
+    if (!data || !data.reportees || data.reportees.length === 0) {
+      document.getElementById("reportees-list").innerHTML = `
+        <div class="warning-message">
+          🚫 You are not eligible to appraise
+        </div>`;
+      return;
+    }
+
+    // ✅ Eligible
+    displayReportees(data.reportees);
+
+  } catch (error) {
+    console.error("Error loading reportees:", error);
+    document.getElementById("reportees-list").innerHTML = `
+      <p class="error">Failed to load reportees</p>`;
+  }
+}
+
+  
+  function displayReportees(reportees) {
+    const container = document.getElementById('reportees-list');
+    
+    if (!reportees || reportees.length === 0) {
+      container.innerHTML = `
+        <div class="warning-message">
+          <h3>⚠️ You are not eligible to appraise employees</h3>
+          <p>You currently have no direct reportees assigned to you. Only managers can appraise their team members.</p>
+          <p style="margin-top: 10px;"><strong>Note:</strong> If you believe you should have access to appraise team members, please contact your HR administrator.</p>
+        </div>`;
+      return;
+    }
+    
+    let html = '';
+    reportees.forEach(reportee => {
+      html += `
+        <div class="reportee-card">
+          <h4>${reportee.EMPLOYEE_NAME || 'N/A'}</h4>
+          <p><strong>Employee ID:</strong> ${reportee.EMPLOYEE_ID || 'N/A'}</p>
+          <p><strong>Email:</strong> ${reportee.EMAIL || 'N/A'}</p>
+          <p><strong>Department:</strong> ${reportee.DEPT_NAME || 'N/A'}</p>
+          <p><strong>Designation:</strong> ${reportee.DESIGNATION || 'N/A'}</p>
+          <p><strong>Current Rating:</strong> <span class="rating-badge" style="font-size: 1rem;">${reportee.LAST_RATING || '0'}/5.0</span></p>
+          <button class="btn btn-primary" style="margin-top: 15px;" onclick="showAppraisalForm('${reportee.EMPLOYEE_ID}', '${(reportee.EMPLOYEE_NAME || 'Employee').replace(/'/g, "\\'")}')">
+            📝 Give Appraisal
+          </button>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+  }
+  
+  function showAppraisalForm(employeeId, employeeName) {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const modalBody = `
+      <div class="appraisal-form">
+        <div class="form-group">
+          <label>Performance Rating (0-5):</label>
+          <input type="number" min="0" max="5" step="0.1" id="rating" placeholder="Enter rating (e.g., 4.5)" required>
+        </div>
+        <div class="form-group">
+          <label>Performance Comments:</label>
+          <textarea id="comments" placeholder="Provide detailed feedback on performance, achievements, and areas for improvement..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Appraisal Date:</label>
+          <input type="date" id="date" value="${today}" required>
+        </div>
+        <div style="margin-top: 25px;">
+          <button type="button" class="btn btn-success" onclick="submitAppraisal('${employeeId}', '${employeeName.replace(/'/g, "\\'")}')">✅ Submit Appraisal</button>
+          <button type="button" class="btn btn-cancel" onclick="closeModal()">❌ Cancel</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('modalTitle').innerHTML = `📝 Appraisal for ${employeeName}`;
+    document.getElementById('modalBody').innerHTML = modalBody;
+    document.getElementById('appraisalModal').classList.add('show');
+  }
+  
+  async function submitAppraisal(employeeId, employeeName) {
+    const rating = document.getElementById('rating').value;
+    const comments = document.getElementById('comments').value;
+    const date = document.getElementById('date').value;
+    
+    if (!rating || !comments || !date) {
+      showNotification('Please fill in all fields', 'error');
+      return;
+    }
+    
+    if (parseFloat(rating) < 0 || parseFloat(rating) > 5) {
+      showNotification('Rating must be between 0 and 5', 'error');
+      return;
+    }
+    
+    try {
+      console.log('Submitting appraisal:', {
+        employee_id: employeeId,
+        manager_id: EMPLOYEE_ID,
+        final_rating: parseFloat(rating),
+        comments: comments,
+        appraisal_date: date
+      });
+      
+      const response = await fetch(`${API_BASE}/api/appraisal/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_id: employeeId,
+          manager_id: EMPLOYEE_ID,
+          final_rating: parseFloat(rating),
+          comments: comments,
+          appraisal_date: date
+        })
+      });
+      
+      const data = await response.json();
+      console.log('Submit response:', data);
+      
+      if (data.success) {
+        showNotification('✅ Appraisal submitted successfully for ' + employeeName + '!', 'success');
+        closeModal();
+        loadReportees();
+      } else {
+        showNotification('Error: ' + (data.message || 'Failed to submit appraisal'), 'error');
+      }
+    } catch (error) {
+      console.error('Error submitting appraisal:', error);
+      showNotification('Error submitting appraisal: ' + error.message, 'error');
+    }
+  }
+  
+  async function loadHierarchy() {
+    console.log('Loading hierarchy for:', EMPLOYEE_ID);
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/hierarchy/${EMPLOYEE_ID}`);
+      const data = await response.json();
+      
+      console.log('Hierarchy data:', data);
+      
+      if (data.success) {
+        displayHierarchy(data);
+      }
+    } catch (error) {
+      console.error('Error loading hierarchy:', error);
+      showNotification('Error loading hierarchy: ' + error.message, 'error');
+    }
+  }
+  
+  /* ── helpers ── */
+  function hierInitials(name) {
+    if (!name) return '?';
+    const p = name.trim().split(' ');
+    return (p.length === 1 ? p[0].slice(0,2) : p[0][0] + p[p.length-1][0]).toUpperCase();
+  }
+
+  function displayHierarchy(data) {
+    const supervisors = data.supervisors || [];
+    const reportees   = data.reportees   || [];
+
+    /* Stats */
+    document.getElementById('hierDirect').textContent = reportees.length;
+    document.getElementById('hierTotal').textContent  = reportees.length;
+    document.getElementById('hierLevel').textContent  = supervisors.length + 1;
+    document.getElementById('hierStats').style.display = 'grid';
+
+    /* ── Supervisor chain ── */
+    const supCtr = document.getElementById('supervisors-list');
+    if (!supervisors.length) {
+      supCtr.innerHTML = '<p style="color:#94a3b8;font-size:13px;padding:8px 0;">You are at the top of the hierarchy.</p>';
+    } else {
+      const chain = [...supervisors].reverse(); // CEO first
+      let html = '<div class="hier-chain">';
+      chain.forEach((s, i) => {
+        const isCEO = (i === 0);
+        const ini   = hierInitials(s.EMPLOYEE_NAME);
+        html += `<div class="hier-node" title="Level ${s.LEVEL || '?'}">
+          ${isCEO ? '<span class="hier-badge ceo">CEO</span>' : ''}
+          <div class="hier-avatar">${ini}</div>
+          <div>
+            <div class="hier-node-name">${s.EMPLOYEE_NAME || 'N/A'}</div>
+            <div class="hier-node-sub">Level ${s.LEVEL || '?'} · ${s.EMPLOYEE_ID || ''}</div>
+          </div>
+        </div>`;
+        if (i < chain.length - 1) html += '<span class="hier-arrow">›</span>';
+      });
+      /* arrow + current user */
+      html += `<span class="hier-arrow">›</span>
+        <div class="hier-node you">
+          <span class="hier-badge you">You</span>
+          <div class="hier-avatar">${hierInitials('You')}</div>
+          <div>
+            <div class="hier-node-name">You</div>
+            <div class="hier-node-sub">${EMPLOYEE_ID}</div>
+          </div>
+        </div>`;
+      html += '</div>';
+      supCtr.innerHTML = html;
+    }
+
+    /* ── Direct reportees ── */
+    const repCtr = document.getElementById('hierarchy-reportees-list');
+    if (!reportees.length) {
+      repCtr.innerHTML = '<div class="empty-state"><p>No direct reportees under your supervision.</p></div>';
+    } else {
+      let html = '<div class="hier-rep-grid">';
+      reportees.forEach(r => {
+        const ini = hierInitials(r.EMPLOYEE_NAME);
+        html += `<div class="hier-rep-card">
+          <div class="hier-rep-hdr">
+            <div class="hier-rep-av">${ini}</div>
+            <div>
+              <div class="hier-rep-name">${r.EMPLOYEE_NAME || 'N/A'}</div>
+              <div class="hier-rep-id">${r.EMPLOYEE_ID || ''}</div>
+            </div>
+          </div>
+          <div class="hier-rep-meta">
+            <div class="hier-rep-dept">🏢 ${r.DEPT_NAME || 'N/A'}</div>
+            <div class="hier-rep-lvl">Level ${r.LEVEL || 1}</div>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+      repCtr.innerHTML = html;
+    }
+  }
+  
+
+async function loadViewableAppraisals() {
+  const container = document.getElementById("viewable-appraisals-list");
+
+  console.log("Loading viewable appraisals for:", EMPLOYEE_ID);
+  console.log("API_BASE:", API_BASE);
+  console.log("Full URL:", `${API_BASE}/api/appraisal/viewable/${EMPLOYEE_ID}`);
+
+  try {
+    const response = await fetch(`${API_BASE}/api/appraisal/viewable/${EMPLOYEE_ID}`);
+    
+    console.log("Response status:", response.status);
+    console.log("Response OK:", response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log("Viewable appraisals data:", data);
+    console.log("Data success:", data.success);
+    console.log("Appraisals array:", data.viewable_appraisals);
+    console.log("Appraisals length:", data.viewable_appraisals ? data.viewable_appraisals.length : 0);
+
+    // ✅ CASE 1: No data or empty array
+    if (!data.success || !data.viewable_appraisals || data.viewable_appraisals.length === 0) {
+      console.log("No appraisals found - showing empty state");
+      container.innerHTML = `
+        <div class="empty-state">
+          <h3>No Team Appraisals</h3>
+          <p>You are not managing any employees currently, or your team members haven't been appraised yet.</p>
+          <p style="margin-top: 10px; font-size: 0.9rem; color: #718096;">
+            ${IS_MANAGER ? 'Once you appraise your team members, their appraisals will appear here.' : 'Only managers can view team appraisals.'}
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    // ✅ CASE 2: Data exists
+    console.log("Building appraisals table with", data.viewable_appraisals.length, "records");
+    let html = '<div class="info-card">';
+    html += '<table class="data-table"><thead><tr><th>Employee</th><th>Department</th><th>Rating</th><th>Date</th><th>Appraised By</th></tr></thead><tbody>';
+    
+    data.viewable_appraisals.forEach((appraisal, index) => {
+      console.log(`Processing appraisal ${index}:`, appraisal);
+      
+      const rating = appraisal.FINAL_RATING || 'Not rated';
+      const appraisalDate = appraisal.APPRAISAL_DATE 
+        ? new Date(appraisal.APPRAISAL_DATE).toLocaleDateString() 
+        : 'N/A';
+      
+      html += `<tr>
+        <td>${appraisal.EMPLOYEE_NAME || 'N/A'}</td>
+        <td>${appraisal.DEPT_NAME || 'N/A'}</td>
+        <td><span class="rating-badge" style="font-size: 0.9rem;">${rating}${rating !== 'Not rated' ? '/5' : ''}</span></td>
+        <td>${appraisalDate}</td>
+        <td>${appraisal.SUBMITTED_BY || 'N/A'}</td>
+      </tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    console.log("Setting container HTML");
+    container.innerHTML = html;
+    console.log("Table rendered successfully");
+    
+  } catch (err) {
+    console.error("Error loading viewable appraisals:", err);
+    console.error("Error stack:", err.stack);
+    container.innerHTML = `
+      <div class="warning-message">
+        <h3>⚠️ Error Loading Data</h3>
+        <p>Failed to load team appraisals. Please try again later.</p>
+        <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${err.message}</p>
+        <p style="font-size: 0.85rem; margin-top: 5px; color: #666;">Check browser console for details.</p>
+      </div>
+    `;
+  }
+}
+  function displayViewableAppraisals(appraisals) {
+    const container = document.getElementById('viewable-appraisals-list');
+    
+    if (!appraisals || appraisals.length === 0) {
+      container.innerHTML = '<div class="empty-state"><h3>No Team Appraisals</h3><p>No appraisals available for your team members</p></div>';
+      return;
+    }
+    
+    let html = '<div class="info-card">';
+    html += '<table class="data-table"><thead><tr><th>Level</th><th>Employee</th><th>Department</th><th>Rating</th><th>Date</th><th>Appraised By</th></tr></thead><tbody>';
+    appraisals.forEach(appraisal => {
+      const rating = appraisal.FINAL_RATING || 'Not rated';
+      html += `<tr>
+        <td>L${appraisal.LEVEL || 'N/A'}</td>
+        <td>${appraisal.EMPLOYEE_NAME || 'N/A'}</td>
+        <td>${appraisal.DEPT_NAME || 'N/A'}</td>
+        <td><span class="rating-badge" style="font-size: 0.9rem;">${rating}${rating !== 'Not rated' ? '/5' : ''}</span></td>
+        <td>${appraisal.APPRAISAL_DATE ? new Date(appraisal.APPRAISAL_DATE).toLocaleDateString() : 'N/A'}</td>
+        <td>${appraisal.SUBMITTED_BY || 'N/A'}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }
+  
+  async function loadGoals() {
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/employee/${EMPLOYEE_ID}`);
+      const data = await response.json();
+      
+      if (data.success && data.goals) {
+        displayGoalsList(data.goals);
+      }
+    } catch (error) {
+      console.error('Error loading goals:', error);
+      showNotification('Error loading goals: ' + error.message, 'error');
+    }
+  }
+  
+  function displayGoalsList(goals) {
+    const container = document.getElementById('goals-list');
+    
+    if (!goals || goals.length === 0) {
+      container.innerHTML = '<div class="empty-state"><h3>No Goals Yet</h3><p>Start setting your professional goals</p></div>';
+      return;
+    }
+    
+    let html = '<table class="data-table"><thead><tr><th>Goal</th><th>Target Date</th><th>Status</th><th>Created</th></tr></thead><tbody>';
+    goals.forEach(goal => {
+      const statusClass = goal.STATUS && goal.STATUS.toLowerCase() === 'completed' ? 'completed' : 'planned';
+      html += `<tr>
+        <td>${goal.GOAL_DESCRIPTION || 'N/A'}</td>
+        <td>${goal.TARGET_DATE || 'N/A'}</td>
+        <td><span class="status-badge ${statusClass}">${goal.STATUS || 'N/A'}</span></td>
+        <td>${goal.CREATED_DATE ? new Date(goal.CREATED_DATE).toLocaleDateString() : 'N/A'}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    
+    container.innerHTML = html;
+  }
+  
+  function showAddGoalForm() {
+    const modalBody = `
+      <div class="appraisal-form">
+        <div class="form-group">
+          <label>Goal Description:</label>
+          <textarea id="goalDesc" placeholder="Describe your goal..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Target Date:</label>
+          <input type="date" id="goalDate" required>
+        </div>
+        <div class="form-group">
+          <label>Status:</label>
+          <select id="goalStatus">
+            <option value="Planned">Planned</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div style="margin-top: 25px;">
+          <button type="button" class="btn btn-success" onclick="submitGoal()">✅ Add Goal</button>
+          <button type="button" class="btn btn-cancel" onclick="closeModal()">❌ Cancel</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('modalTitle').innerHTML = '🎯 Add New Goal';
+    document.getElementById('modalBody').innerHTML = modalBody;
+    document.getElementById('appraisalModal').classList.add('show');
+  }
+  
+  async function submitGoal() {
+    const description = document.getElementById('goalDesc').value;
+    const date = document.getElementById('goalDate').value;
+    const status = document.getElementById('goalStatus').value;
+    
+    if (!description || !date) {
+      showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/goals/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_id: EMPLOYEE_ID,
+          goal_description: description,
+          target_date: date,
+          status: status
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showNotification('✅ Goal added successfully!', 'success');
+        closeModal();
+        loadGoals();
+      } else {
+        showNotification('Error adding goal', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      showNotification('Error adding goal: ' + error.message, 'error');
+    }
+  }
+  
+  async function loadTrainings() {
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/employee/${EMPLOYEE_ID}`);
+      const data = await response.json();
+      
+      if (data.success && data.trainings) {
+        displayTrainingsList(data.trainings);
+      }
+    } catch (error) {
+      console.error('Error loading trainings:', error);
+      showNotification('Error loading trainings: ' + error.message, 'error');
+    }
+  }
+  
+  function displayTrainingsList(trainings) {
+    const container = document.getElementById('trainings-list');
+    
+    if (!trainings || trainings.length === 0) {
+      container.innerHTML = '<div class="empty-state"><h3>No Trainings Yet</h3><p>Start tracking your professional development</p></div>';
+      return;
+    }
+    
+    let html = '<table class="data-table"><thead><tr><th>Training</th><th>Completion Date</th><th>Skills Acquired</th><th>Status</th></tr></thead><tbody>';
+    trainings.forEach(training => {
+      const statusClass = training.STATUS && training.STATUS.toLowerCase() === 'completed' ? 'completed' : 'planned';
+      html += `<tr>
+        <td>${training.TRAINING_NAME || 'N/A'}</td>
+        <td>${training.COMPLETION_DATE || 'N/A'}</td>
+        <td>${training.SKILLS_ACQUIRED || 'N/A'}</td>
+        <td><span class="status-badge ${statusClass}">${training.STATUS || 'N/A'}</span></td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    
+    container.innerHTML = html;
+  }
+  
+  function showAddTrainingForm() {
+    const modalBody = `
+      <div class="appraisal-form">
+        <div class="form-group">
+          <label>Training Name:</label>
+          <input type="text" id="trainingName" placeholder="Enter training name" required>
+        </div>
+        <div class="form-group">
+          <label>Completion Date:</label>
+          <input type="date" id="trainingDate" required>
+        </div>
+        <div class="form-group">
+          <label>Skills Acquired:</label>
+          <textarea id="trainingSkills" placeholder="List skills you acquired..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Status:</label>
+          <select id="trainingStatus">
+            <option value="Completed">Completed</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Planned">Planned</option>
+          </select>
+        </div>
+        <div style="margin-top: 25px;">
+          <button type="button" class="btn btn-success" onclick="submitTraining()">✅ Add Training</button>
+          <button type="button" class="btn btn-cancel" onclick="closeModal()">❌ Cancel</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('modalTitle').innerHTML = '📚 Add Training Record';
+    document.getElementById('modalBody').innerHTML = modalBody;
+    document.getElementById('appraisalModal').classList.add('show');
+  }
+  
+  async function submitTraining() {
+    const name = document.getElementById('trainingName').value;
+    const date = document.getElementById('trainingDate').value;
+    const skills = document.getElementById('trainingSkills').value;
+    const status = document.getElementById('trainingStatus').value;
+    
+    if (!name || !date) {
+      showNotification('Please fill in all required fields', 'error');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/appraisal/trainings/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employee_id: EMPLOYEE_ID,
+          training_name: name,
+          completion_date: date,
+          status: status,
+          skills_acquired: skills
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showNotification('✅ Training added successfully!', 'success');
+        closeModal();
+        loadTrainings();
+      } else {
+        showNotification('Error adding training', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding training:', error);
+      showNotification('Error adding training: ' + error.message, 'error');
+    }
+  }
+  
+  function closeModal() {
+    document.getElementById('appraisalModal').classList.remove('show');
+  }
+  
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    const contentArea = document.querySelector('.content-area');
+    contentArea.insertBefore(notification, contentArea.firstChild);
+    
+    setTimeout(() => notification.remove(), 5000);
+  }
+  
+  document.getElementById('appraisalModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Solutions | ChakoraHub</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:#eef1f6;
+}
+
+/* HEADER */
+
+header{
+height:80px;
+background:white;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 50px;
+border-bottom:1px solid #ddd;
+}
+
+.logo-area{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.logo-area img{
+height:50px;
+}
+
+.logo-text{
+font-size:22px;
+font-weight:bold;
+color:#1e73be;
+}
+
+/* LAYOUT */
+
+.container{
+display:flex;
+min-height:calc(100vh - 80px);
+}
+
+.sidebar{
+width:260px;
+background:white;
+box-shadow:2px 0 10px rgba(0,0,0,.05);
+padding-top:20px;
+}
+
+.menu{
+padding:18px 25px;
+cursor:pointer;
+font-weight:600;
+}
+
+.menu:hover{
+background:#f2f6ff;
+}
+
+.active{
+background:#e8edff;
+color:#2d4cff;
+}
+
+.content{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding:40px;
+}
+
+/* CARD */
+
+.card{
+width:750px;
+max-width:95%;
+background:white;
+padding:50px;
+border-radius:14px;
+box-shadow:0 15px 40px rgba(0,0,0,.08);
+text-align:center;
+}
+
+/* ⭐ HEADING STYLE (MAIN FIX) */
+
+.main-icon{
+font-size:60px;
+color:#1e73be;
+margin-bottom:10px;
+}
+
+.main-title{
+color:#1e73be;
+font-size:40px;
+font-weight:700;
+margin-bottom:20px;
+}
+
+.card p{
+white-space:pre-line;
+line-height:1.9;
+}
+
+/* BUTTONS */
+
+button{
+padding:10px 18px;
+margin:6px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+color:white;
+font-weight:600;
+}
+
+.colorBtn{background:#4a90e2;}
+.resetBtn{background:#f39c12;}
+.homeBtn{background:#6c5ce7;}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo-area">
+<img src="/static/logo.png">
+<div class="logo-text">ChakoraHub</div>
+</div>
+</header>
+
+
+<div class="container">
+
+<div class="sidebar">
+<div class="menu" data-key="automation">📋 Automation</div>
+<div class="menu" data-key="aiml">🧠 AI / ML</div>
+<div class="menu" data-key="mdm">📱 MDM</div>
+<div class="menu" data-key="aws">☁️ AWS</div>
+<div class="menu" data-key="api">🔗 API</div>
+</div>
+
+<div class="content">
+<div class="card" id="card"></div>
+</div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+const card=document.getElementById("card");
+const menus=document.querySelectorAll(".menu");
+
+const gradients=[
+"linear-gradient(135deg,#84fab0,#8fd3f4)",
+"linear-gradient(135deg,#a18cd1,#fbc2eb)",
+"linear-gradient(135deg,#43e97b,#38f9d7)"
+];
+
+
+/* ⭐ WELCOME SCREEN */
+
+function showWelcome(){
+
+card.innerHTML=`
+
+<i class="fas fa-layer-group main-icon"></i>
+
+<h1 class="main-title">Our Solutions</h1>
+
+<p>
+To help you populate your **Chakora Hub** website, here is professional content tailored for each category in your "Solutions" menu.
+</p>
+`;
+
+}
+
+showWelcome();
+
+
+/* ⭐ YOUR DATA — NOT CHANGED */
+
+const solutions={
+
+automation:{
+icon:"fas fa-robot",
+title:"Automation",
+desc:`Streamline your business processes and eliminate repetitive manual tasks with our end-to-end automation services. We focus on "intelligent automation" that connects your software tools, optimizes workflows, and reduces human error. Whether it is implementing CI/CD pipelines for your development teams, automating customer communication flows, or building custom RPA (Robotic Process Automation) scripts, our solutions are designed to increase your team’s productivity and allow you to focus on high-value innovation.`
+},
+
+aiml:{
+icon:"fas fa-brain",
+title:"AI / Machine Learning",
+desc:`Transform your raw data into actionable intelligence with our cutting-edge AI and Machine Learning solutions. We help businesses integrate intelligent capabilities into their applications—ranging from predictive analytics and natural language processing to automated computer vision models. By utilizing advanced algorithms and cloud-native ML tools, we enable you to uncover hidden patterns, automate complex cognitive tasks, and create personalized experiences that drive user engagement and business growth.`
+},
+
+mdm:{
+icon:"fas fa-mobile-alt",
+title:"Master Data Management",
+desc:`In today’s data-driven landscape, having a single, trusted "source of truth" is critical for operational excellence. Our Master Data Management (MDM) solutions help you consolidate, clean, and synchronize your enterprise data across disparate systems. We specialize in implementing robust data governance frameworks and technical architectures that eliminate data silos, improve data quality, and provide your business with the reliable insights needed for informed decision-making.`
+},
+
+aws:{
+icon:"fab fa-aws",
+title:"AWS Cloud",
+desc:`Leverage the full power of the AWS ecosystem to build resilient, scalable, and cost-effective digital infrastructures. Our expertise spans the entire serverless and managed services stack—including **API Gateway** for robust entry points, **Lambda** for event-driven compute, and **DynamoDB** for high-performance data storage. From optimizing content delivery with **CloudFront** and **S3** to orchestrating complex workflows using **Step Functions**, **SQS**, and **SES**, we ensure your cloud environment is secure, automated, and ready to handle any scale.`
+},
+
+api:{
+icon:"fas fa-plug",
+title:"API Solutions",
+desc:`Connect your digital world with seamless, high-performance API architectures. We design and develop secure, scalable APIs that allow your internal services and third-party applications to communicate effortlessly. Our focus is on building "API-first" solutions that are well-documented, easy to integrate, and optimized for speed. From simple microservice communication to complex enterprise-level API management, we ensure your data moves securely and reliably across your entire technology stack.`
+}
+
+};
+
+
+
+function loadSolution(key){
+
+const s = solutions[key];
+
+card.innerHTML = `
+
+<i class="${s.icon} main-icon"></i>
+
+<h1 class="main-title">${s.title}</h1>
+
+<p>${s.desc}</p>
+
+<button class="colorBtn" id="colorBtn">Change Color</button>
+<button class="resetBtn" id="resetBtn">Reset</button>
+<button class="homeBtn" id="homeBtn">Back To Home</button>
+`;
+
+document.getElementById("colorBtn")
+.addEventListener("click",()=>{
+card.style.background=
+gradients[Math.floor(Math.random()*gradients.length)];
+});
+
+document.getElementById("resetBtn")
+.addEventListener("click",()=>{
+card.style.background="white";
+loadSolution(key);
+});
+
+document.getElementById("homeBtn")
+.addEventListener("click",()=>{
+card.style.background="white";
+showWelcome();
+});
+
+}
+
+
+/* SIDEBAR */
+
+menus.forEach(menu=>{
+menu.addEventListener("click",()=>{
+menus.forEach(m=>m.classList.remove("active"));
+menu.classList.add("active");
+loadSolution(menu.dataset.key);
+});
+});
+
+});
+
+</script>
+
+</body>
+</html>

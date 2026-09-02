@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Asset Register — ChakoraHub</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Syne:wght@600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ═══════════════════════════════════════════════
+       SHARED TOKENS
+    ═══════════════════════════════════════════════ */
+    :root {
+      --slate:       #0f172a;
+      --slate-mid:   #1e293b;
+      --slate-light: #334155;
+      --steel:       #475569;
+      --muted:       #64748b;
+      --border:      #e2e8f0;
+      --bg:          #f1f5f9;
+      --card:        #ffffff;
+      --accent:      #0ea5e9;
+      --accent-dark: #0369a1;
+      --accent-glow: rgba(14,165,233,0.10);
+      --green:       #059669;
+      --green-bg:    #ecfdf5;
+      --green-bdr:   #a7f3d0;
+      --amber:       #d97706;
+      --amber-bg:    #fffbeb;
+      --amber-bdr:   #fde68a;
+      --rose:        #e11d48;
+      --rose-bg:     #fff1f2;
+      --rose-bdr:    #fecdd3;
+      --violet:      #7c3aed;
+      --violet-bg:   #f5f3ff;
+      --mono:        'JetBrains Mono', monospace;
+
+      /* Register page tokens */
+      --reg-bg: #f0f2f7;
+      --reg-surface: #ffffff;
+      --reg-surface-2: #f7f8fc;
+      --reg-border: #e2e5ef;
+      --reg-border-focus: #3b5bdb;
+      --reg-accent: #3b5bdb;
+      --reg-accent-light: #eef1fd;
+      --reg-accent-dark: #2f4ac0;
+      --reg-text-primary: #1a1d2e;
+      --reg-text-secondary: #5a6282;
+      --reg-text-muted: #9399b2;
+      --reg-success: #2f9e44;
+      --reg-success-light: #ebfbee;
+      --reg-warning: #e67700;
+      --reg-warning-light: #fff9db;
+      --reg-danger: #c92a2a;
+      --reg-danger-light: #fff5f5;
+      --reg-radius: 10px;
+      --reg-radius-sm: 6px;
+      --reg-shadow: 0 2px 12px rgba(59,91,219,0.07);
+      --reg-shadow-lg: 0 8px 32px rgba(59,91,219,0.12);
+      --reg-transition: 0.18s ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--slate); min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ═══════════════════════════════════════════════
+       PAGE HEADER
+    ═══════════════════════════════════════════════ */
+    .page-header {
+      background: linear-gradient(135deg, var(--slate) 0%, var(--slate-mid) 60%, #162032 100%);
+      padding: 13px 30px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      position: sticky; top: 0; z-index: 200; gap: 12px; flex-wrap: wrap;
+    }
+    .hd-left { display: flex; align-items: center; gap: 13px; }
+    .hd-title { font-size: 0.97rem; font-weight: 700; color: #fff; }
+    .hd-sub   { font-size: 0.7rem; color: rgba(255,255,255,0.42); }
+
+    /* ═══════════════════════════════════════════════
+       REGISTER PAGE STYLES
+    ═══════════════════════════════════════════════ */
+    #page-register {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--reg-bg);
+      padding: 32px 16px 64px;
+      min-height: calc(100vh - 64px);
+    }
+    #page-register .reg-card {
+      background: var(--reg-surface);
+      border: 1px solid var(--reg-border);
+      border-radius: 14px;
+      box-shadow: var(--reg-shadow);
+      max-width: 860px;
+      margin: 0 auto 20px;
+      overflow: hidden;
+    }
+    #page-register .reg-card-header {
+      padding: 18px 28px 16px;
+      border-bottom: 1px solid var(--reg-border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: var(--reg-surface-2);
+    }
+    #page-register .reg-card-header h2 {
+      font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700;
+      color: var(--reg-text-primary); letter-spacing: 0.4px; text-transform: uppercase;
+    }
+    #page-register .section-badge {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.4px;
+      padding: 3px 10px; border-radius: 99px;
+      background: var(--reg-accent-light); color: var(--reg-accent);
+    }
+    #page-register .reg-card-body { padding: 24px 28px; }
+    #page-register .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    #page-register .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+    #page-register .field { display: flex; flex-direction: column; gap: 6px; }
+    #page-register label {
+      font-size: 0.78rem; font-weight: 600; color: var(--reg-text-secondary);
+      letter-spacing: 0.3px; text-transform: uppercase;
+    }
+    #page-register label .req { color: var(--reg-accent); margin-left: 2px; }
+    #page-register input[type="text"],
+    #page-register input[type="number"],
+    #page-register input[type="date"],
+    #page-register select,
+    #page-register textarea {
+      width: 100%; padding: 10px 13px; border: 1.5px solid var(--reg-border);
+      border-radius: var(--reg-radius-sm); font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; color: var(--reg-text-primary); background: var(--reg-surface);
+      outline: none; transition: border-color var(--reg-transition), box-shadow var(--reg-transition);
+      appearance: none;
+    }
+    #page-register input:focus, #page-register select:focus, #page-register textarea:focus {
+      border-color: var(--reg-accent); box-shadow: 0 0 0 3px rgba(59,91,219,0.12); background: #fff;
+    }
+    #page-register input::placeholder, #page-register textarea::placeholder { color: var(--reg-text-muted); }
+    #page-register textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    #page-register .select-wrap { position: relative; }
+    #page-register .select-wrap select { padding-right: 34px; cursor: pointer; }
+    #page-register .select-wrap::after {
+      content: ''; position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent;
+      border-top: 5px solid var(--reg-text-muted); pointer-events: none;
+    }
+    #page-register .ownership-toggle { display: flex; gap: 0; border: 1.5px solid var(--reg-border); border-radius: var(--reg-radius-sm); overflow: hidden; }
+    #page-register .ownership-toggle input[type="radio"] { display: none; }
+    #page-register .ownership-toggle label { flex: 1; text-align: center; padding: 10px 0; font-size: 0.85rem; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--reg-text-secondary); cursor: pointer; background: var(--reg-surface); transition: all var(--reg-transition); border: none; }
+    #page-register .ownership-toggle input[type="radio"]:checked + label { background: var(--reg-accent); color: #fff; }
+    #page-register .condition-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    #page-register .condition-group input[type="radio"] { display: none; }
+    #page-register .condition-group label { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1.5px solid var(--reg-border); border-radius: 99px; font-size: 0.82rem; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--reg-text-secondary); cursor: pointer; background: var(--reg-surface); transition: all var(--reg-transition); }
+    #page-register .condition-group input[type="radio"]:checked + label { border-color: var(--reg-accent); background: var(--reg-accent-light); color: var(--reg-accent); }
+    #page-register .condition-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    #page-register .dot-new  { background: var(--reg-success); }
+    #page-register .dot-good { background: #74c0fc; }
+    #page-register .dot-fair { background: var(--reg-warning); }
+    #page-register .dot-poor { background: var(--reg-danger); }
+    #page-register .status-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    #page-register .status-group input[type="radio"] { display: none; }
+    #page-register .status-group label { padding: 7px 16px; border: 1.5px solid var(--reg-border); border-radius: 99px; font-size: 0.82rem; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--reg-text-secondary); cursor: pointer; background: var(--reg-surface); transition: all var(--reg-transition); }
+    #page-register .status-group input#status_active:checked   + label { border-color: var(--reg-success); background: var(--reg-success-light); color: var(--reg-success); }
+    #page-register .status-group input#status_inactive:checked + label { border-color: var(--reg-text-muted); background: #f3f4f6; color: var(--reg-text-secondary); }
+    #page-register .status-group input#status_repair:checked   + label { border-color: var(--reg-warning); background: var(--reg-warning-light); color: var(--reg-warning); }
+    #page-register .status-group input#status_retired:checked  + label { border-color: var(--reg-danger); background: var(--reg-danger-light); color: var(--reg-danger); }
+    #page-register .action-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    #page-register .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 24px; border-radius: var(--reg-radius-sm); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; border: none; transition: all var(--reg-transition); letter-spacing: 0.1px; }
+    #page-register .btn svg { width: 16px; height: 16px; }
+    #page-register .btn-primary { background: var(--reg-accent); color: #fff; }
+    #page-register .btn-primary:hover { background: var(--reg-accent-dark); }
+    #page-register .btn-outline { background: var(--reg-surface); color: var(--reg-text-secondary); border: 1.5px solid var(--reg-border); }
+    #page-register .btn-outline:hover { border-color: var(--reg-accent); color: var(--reg-accent); background: var(--reg-accent-light); }
+    #page-register .spacer { flex: 1; }
+    #page-register .hint { font-size: 0.75rem; color: var(--reg-text-muted); margin-top: 3px; }
+    #page-register .divider { height: 1px; background: var(--reg-border); margin: 6px 0 18px; }
+    #reg-toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--slate); color: #fff; padding: 13px 20px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      opacity: 0; transform: translateY(12px); transition: all 0.28s ease;
+      pointer-events: none; z-index: 999;
+    }
+    #reg-toast.show { opacity: 1; transform: translateY(0); }
+    #reg-toast.success { background: var(--green); }
+    #reg-toast.warning { background: var(--amber); }
+    @media (max-width: 640px) {
+      #page-register .grid-2, #page-register .grid-3 { grid-template-columns: 1fr; }
+      #page-register .reg-card-body { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="page-header">
+  <div class="hd-left">
+    <div>
+      <div class="hd-title"><i class="fas fa-boxes-stacked" style="color:var(--accent);margin-right:8px;"></i>Asset Portal</div>
+      <div class="hd-sub">ChakoraHub Assets Module</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     REGISTER PAGE
+══════════════════════════════════════════════ -->
+<div id="page-register">
+
+  <!-- SECTION 1 — ASSET DETAILS -->
+  <div class="reg-card">
+    <div class="reg-card-header">
+      <h2>Asset Details</h2>
+      <span class="section-badge">Core Info</span>
+    </div>
+    <div class="reg-card-body">
+
+      <div class="field" style="margin-bottom:20px;">
+        <label>Asset Ownership <span class="req">*</span></label>
+        <div class="ownership-toggle">
+          <input type="radio" name="OWNED_BY" id="owned_individual" value="Individual" checked />
+          <label for="owned_individual">👤 Individual</label>
+          <input type="radio" name="OWNED_BY" id="owned_org" value="Organization" />
+          <label for="owned_org">🏢 Organization</label>
+        </div>
+        <p class="hint">Individual = assigned to a specific person. Organization = shared/pooled asset.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Asset ID</label>
+          <input type="text" id="ASSET_ID" placeholder="Auto-generated on submit" readonly style="background:var(--reg-surface-2);color:var(--reg-text-muted);" />
+          <p class="hint">System-generated automatically.</p>
+        </div>
+        <div class="field">
+          <label>Asset Type <span class="req">*</span></label>
+          <div class="select-wrap">
+            <select id="TYPE_ID">
+              <option value="">— Select type —</option>
+              <option value="Laptop">Laptop</option>
+              <option value="Desktop">Desktop</option>
+              <option value="Mobile Phone">Mobile Phone</option>
+              <option value="Tablet">Tablet</option>
+              <option value="Monitor">Monitor</option>
+              <option value="Keyboard / Mouse">Keyboard / Mouse</option>
+              <option value="Headset">Headset</option>
+              <option value="Other Peripheral">Other Peripheral</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="field">
+          <label>Model Name <span class="req">*</span></label>
+          <input type="text" id="MODEL_ID" placeholder="e.g. MacBook Pro 14-inch M3" />
+        </div>
+        <div class="field">
+          <label>Serial Number</label>
+          <input type="text" id="SERIAL_ID" placeholder="e.g. C02XG0JHJGH5" />
+        </div>
+        <div class="field">
+          <label>Vendor / Supplier</label>
+          <input type="text" id="VENDOR_ID" placeholder="e.g. Apple, Dell, Logitech" />
+        </div>
+        <div class="field">
+          <label>Operating System</label>
+          <input type="text" id="OS" placeholder="e.g. macOS 14.4, Windows 11 Pro" />
+        </div>
+        <div class="field">
+          <label>RAM</label>
+          <input type="text" id="RAM" placeholder="e.g. 16 GB" />
+        </div>
+        <div class="field">
+          <label>Storage (SSD / HDD)</label>
+          <input type="text" id="SSD" placeholder="e.g. 512 GB SSD" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 — ASSIGNMENT & LOCATION -->
+  <div class="reg-card">
+    <div class="reg-card-header">
+      <h2>Assignment &amp; Location</h2>
+      <span class="section-badge">Who &amp; Where</span>
+    </div>
+    <div class="reg-card-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Assigned To</label>
+          <input type="text" id="ASSIGNED_TO" placeholder="Full name or Employee ID" />
+          <p class="hint">Leave blank for unassigned / pooled assets.</p>
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input type="text" id="LOCATION" placeholder="e.g. Hyderabad HQ – Floor 3" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 — PURCHASE & WARRANTY -->
+  <div class="reg-card">
+    <div class="reg-card-header">
+      <h2>Purchase &amp; Warranty</h2>
+      <span class="section-badge">Finance</span>
+    </div>
+    <div class="reg-card-body">
+      <div class="grid-3">
+        <div class="field">
+          <label>Purchase Date</label>
+          <input type="date" id="PURCHASE_DATE" />
+        </div>
+        <div class="field">
+          <label>Warranty Expiry</label>
+          <input type="date" id="WARRANTY_EXPIRY" />
+        </div>
+        <div class="field">
+          <label>Price (₹)</label>
+          <input type="number" id="PRICE" placeholder="0.00" min="0" step="0.01" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 — CONDITION & STATUS -->
+  <div class="reg-card">
+    <div class="reg-card-header">
+      <h2>Condition &amp; Status</h2>
+      <span class="section-badge">Current State</span>
+    </div>
+    <div class="reg-card-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Condition <span class="req">*</span></label>
+          <div class="condition-group">
+            <input type="radio" name="CONDITION" id="cond_new"  value="New"  checked />
+            <label for="cond_new"><span class="condition-dot dot-new"></span>New</label>
+            <input type="radio" name="CONDITION" id="cond_good" value="Good" />
+            <label for="cond_good"><span class="condition-dot dot-good"></span>Good</label>
+            <input type="radio" name="CONDITION" id="cond_fair" value="Fair" />
+            <label for="cond_fair"><span class="condition-dot dot-fair"></span>Fair</label>
+            <input type="radio" name="CONDITION" id="cond_poor" value="Poor" />
+            <label for="cond_poor"><span class="condition-dot dot-poor"></span>Poor</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Status <span class="req">*</span></label>
+          <div class="status-group">
+            <input type="radio" name="STATUS" id="status_active"   value="Active"   checked />
+            <label for="status_active">Active</label>
+            <input type="radio" name="STATUS" id="status_inactive" value="Inactive" />
+            <label for="status_inactive">Inactive</label>
+            <input type="radio" name="STATUS" id="status_repair"   value="In Repair" />
+            <label for="status_repair">In Repair</label>
+            <input type="radio" name="STATUS" id="status_retired"  value="Retired" />
+            <label for="status_retired">Retired</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 — NOTES -->
+  <div class="reg-card">
+    <div class="reg-card-header">
+      <h2>Additional Notes</h2>
+      <span class="section-badge">Optional</span>
+    </div>
+    <div class="reg-card-body">
+      <div class="field">
+        <label>Notes / Remarks</label>
+        <textarea id="NOTES" placeholder="Any additional information about this asset…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="reg-card">
+    <div class="reg-card-body" style="padding:18px 28px;">
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="submitForm()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          <span id="submit-btn-text">Register Asset</span>
+        </button>
+        <button class="btn btn-outline" onclick="resetForm()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+          Reset All Fields
+        </button>
+        <div class="spacer"></div>
+        <span style="font-size:0.78rem;color:var(--reg-text-muted);">Fields marked <strong style="color:var(--reg-accent);">*</strong> are required</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-register -->
+
+<!-- Toast -->
+<div id="reg-toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ════════════════════════════════════════
+   STORAGE HELPERS
+════════════════════════════════════════ */
+const STORAGE_KEY = 'chakora_assets_v1';
+
+function loadAssets() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function saveAssets(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+function generateAssetId() {
+  const assets = loadAssets();
+  const year = new Date().getFullYear();
+  const num = String(assets.length + 1).padStart(4, '0');
+  return `AST-${year}${num}`;
+}
+
+/* ════════════════════════════════════════
+   REGISTER FORM
+════════════════════════════════════════ */
+let editMode    = false;
+let editAssetId = null;
+
+function getField(id) { return document.getElementById(id); }
+
+function collectFormData() {
+  const typeVal = getField('TYPE_ID').value || null;
+  return {
+    ASSET_ID:        getField('ASSET_ID').value.trim() || null,
+    TYPE_ID:         typeVal,
+    TYPE_NAME:       typeVal,
+    MODEL_ID:        getField('MODEL_ID').value.trim(),
+    MODEL_NAME:      getField('MODEL_ID').value.trim(),
+    SERIAL_ID:       getField('SERIAL_ID').value.trim() || null,
+    SERIAL_NO:       getField('SERIAL_ID').value.trim() || null,
+    VENDOR_ID:       getField('VENDOR_ID').value.trim() || null,
+    VENDOR_NAME:     getField('VENDOR_ID').value.trim() || null,
+    OS:              getField('OS').value.trim() || null,
+    RAM:             getField('RAM').value.trim() || null,
+    SSD:             getField('SSD').value.trim() || null,
+    OWNED_BY:        document.querySelector('input[name="OWNED_BY"]:checked')?.value || '',
+    PURCHASE_DATE:   getField('PURCHASE_DATE').value || null,
+    WARRANTY_EXPIRY: getField('WARRANTY_EXPIRY').value || null,
+    LOCATION:        getField('LOCATION').value.trim() || null,
+    CONDITION:       document.querySelector('input[name="CONDITION"]:checked')?.value || '',
+    STATUS:          document.querySelector('input[name="STATUS"]:checked')?.value || '',
+    PRICE:           getField('PRICE').value !== '' ? Number(getField('PRICE').value) : null,
+    ASSIGNED_TO:     getField('ASSIGNED_TO').value.trim() || null,
+    NOTES:           getField('NOTES').value.trim() || null,
+  };
+}
+
+function populateForm(data) {
+  getField('ASSET_ID').value        = data.ASSET_ID        || '';
+  getField('TYPE_ID').value         = data.TYPE_ID || data.TYPE_NAME  || '';
+  getField('MODEL_ID').value        = data.MODEL_ID || data.MODEL_NAME || '';
+  getField('SERIAL_ID').value       = data.SERIAL_ID || data.SERIAL_NO || '';
+  getField('VENDOR_ID').value       = data.VENDOR_ID || data.VENDOR_NAME || '';
+  getField('OS').value              = data.OS              || '';
+  getField('RAM').value             = data.RAM             || '';
+  getField('SSD').value             = data.SSD             || '';
+  getField('PURCHASE_DATE').value   = data.PURCHASE_DATE   || '';
+  getField('WARRANTY_EXPIRY').value = data.WARRANTY_EXPIRY || '';
+  getField('LOCATION').value        = data.LOCATION        || '';
+  getField('PRICE').value           = data.PRICE           || '';
+  getField('ASSIGNED_TO').value     = data.ASSIGNED_TO     || '';
+  getField('NOTES').value           = data.NOTES           || '';
+  if (data.OWNED_BY) {
+    const r = document.querySelector(`input[name="OWNED_BY"][value="${data.OWNED_BY}"]`);
+    if (r) r.checked = true;
+  }
+  if (data.CONDITION) {
+    const r = document.querySelector(`input[name="CONDITION"][value="${data.CONDITION}"]`);
+    if (r) r.checked = true;
+  }
+  if (data.STATUS) {
+    const r = document.querySelector(`input[name="STATUS"][value="${data.STATUS}"]`);
+    if (r) r.checked = true;
+  }
+}
+
+function loadForEdit(assetId) {
+  const asset = loadAssets().find(a => a.ASSET_ID === assetId);
+  if (!asset) { showToast('Asset not found.', 'warning'); return; }
+  populateForm(asset);
+  editMode = true;
+  editAssetId = assetId;
+  getField('submit-btn-text').textContent = 'Update Asset';
+  getField('ASSET_ID').style.background = '#fff9db';
+  getField('ASSET_ID').style.color = '#e67700';
+  getField('ASSET_ID').style.fontWeight = '600';
+  showToast(`Asset ${assetId} loaded for editing.`, 'success');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function submitForm() {
+  const data = collectFormData();
+  if (!data.TYPE_ID)   { showToast('Please select an Asset Type.', 'warning'); return; }
+  if (!data.MODEL_ID)  { showToast('Please enter the Model Name.', 'warning'); return; }
+  if (!data.OWNED_BY)  { showToast('Please select Asset Ownership.', 'warning'); return; }
+
+  let assets = loadAssets();
+
+  if (editMode && editAssetId) {
+    const idx = assets.findIndex(a => a.ASSET_ID === editAssetId);
+    if (idx >= 0) {
+      data.ASSET_ID = editAssetId;
+      assets[idx] = data;
+    }
+    saveAssets(assets);
+    showToast(`Asset ${editAssetId} updated successfully.`, 'success');
+    resetForm(false);
+    editMode = false;
+    editAssetId = null;
+    getField('submit-btn-text').textContent = 'Register Asset';
+  } else {
+    data.ASSET_ID = generateAssetId();
+    assets.push(data);
+    saveAssets(assets);
+    showToast(`Asset ${data.ASSET_ID} registered successfully.`, 'success');
+    resetForm(false);
+  }
+}
+
+function resetForm(notify = true) {
+  ['MODEL_ID','SERIAL_ID','VENDOR_ID','OS','RAM','SSD',
+   'PURCHASE_DATE','WARRANTY_EXPIRY','LOCATION','PRICE','ASSIGNED_TO','NOTES']
+    .forEach(id => { getField(id).value = ''; });
+  getField('TYPE_ID').value = '';
+  getField('ASSET_ID').value = '';
+  getField('ASSET_ID').style.background = '';
+  getField('ASSET_ID').style.color = '';
+  getField('ASSET_ID').style.fontWeight = '';
+  document.getElementById('owned_individual').checked = true;
+  document.getElementById('cond_new').checked = true;
+  document.getElementById('status_active').checked = true;
+  editMode = false;
+  editAssetId = null;
+  getField('submit-btn-text').textContent = 'Register Asset';
+  if (notify) showToast('All fields have been cleared.');
+}
+
+/* ════════════════════════════════════════
+   TOAST
+════════════════════════════════════════ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('reg-toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => { t.className = ''; }, 3200);
+}
+</script>
+</body>
+</html>

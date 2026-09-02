@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pay Slip — Chakora Hub</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+      color: #222;
+      min-height: 100vh;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 30px;
+      background: linear-gradient(to right, #64b5f6, #9575cd);
+      height: 100px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .logo img  { height: 80px; }
+    .center-text { flex:1; text-align:center; font-size:1.3rem; font-weight:bold; }
+    .profile-section { display:flex; align-items:center; gap:12px; }
+    .reg-id {
+      font-size:.9rem; font-weight:500; color:#fffbea;
+      background:rgba(0,0,0,.2); padding:4px 10px; border-radius:8px;
+    }
+    .profile-wrapper { position:relative; cursor:pointer; transition:transform .3s; }
+    .profile-wrapper:hover { transform:scale(1.05); }
+    .profile-pic { width:50px; height:50px; border-radius:50%; border:2px solid white; object-fit:cover; }
+    .dropdown-menu {
+      display:none; position:absolute; top:60px; right:0;
+      background:#fff; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.15);
+      z-index:1000; min-width:140px;
+    }
+    .dropdown-menu a { display:block; padding:10px 15px; color:#444; font-weight:500; text-decoration:none; border-bottom:1px solid #eee; }
+    .dropdown-menu a:last-child { border-bottom:none; }
+    .dropdown-menu a:hover { background:#f0f0f0; }
+
+    /* ══ LAYOUT ══ */
+    .main-wrapper { display:flex; margin-top:10px; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width:230px; background:#e8eaf6; padding:20px;
+      min-height:calc(100vh - 120px);
+      height:calc(100vh - 120px);
+      overflow-y:auto;
+      box-shadow:2px 0 6px rgba(0,0,0,.05);
+      flex-shrink:0;
+      position:sticky;
+      top:0;
+    }
+    .sidebar h3 { color:#3f51b5; margin-bottom:15px; font-size:1rem; }
+    .sidebar a {
+      display:block; color:#333; padding:10px 0;
+      text-decoration:none; font-weight:500; transition:all .3s;
+    }
+    .sidebar a:hover { color:#5e35b1; transform:translateX(8px); }
+    .sidebar a.active {
+      color:#5e35b1; font-weight:700;
+      border-left:3px solid #5e35b1; padding-left:8px;
+    }
+
+    /* ══ CONTENT ══ */
+    .content-area { flex:1; padding:28px 32px; background:#fdfdfd; }
+
+    .page-title {
+      font-size:1.5rem; font-weight:700; color:#1a3c6e;
+      display:flex; align-items:center; gap:10px; margin-bottom:4px;
+    }
+    .page-subtitle { font-size:.88rem; color:#888; margin-bottom:28px; }
+
+    /* ══ CARD ══ */
+    .slip-card {
+      background:#fff; border-radius:16px;
+      box-shadow:0 4px 24px rgba(26,60,110,.1);
+      overflow:hidden; max-width:1440px;
+      margin: 30px;
+       border-radius: 20px;
+    }
+    .slip-card-header {
+      background:linear-gradient(135deg,#1a3c6e 0%,#2e86de 100%);
+      padding:22px 28px; color:#fff;
+    }
+    .slip-card-header h2 { font-size:1.15rem; font-weight:700; margin:0; }
+    .slip-card-header p  { font-size:.82rem; opacity:.8; margin:5px 0 0; }
+    .slip-card-body { padding:28px; }
+
+    /* ══ EMPLOYEE INFO ══ */
+    .emp-block {
+      background:#eaf2fb; border-radius:12px; padding:18px 20px;
+      border-left:4px solid #2e86de; margin-bottom:24px;
+    }
+    .emp-block .name { font-size:1.1rem; font-weight:800; color:#1a3c6e; }
+    .emp-block .role { font-size:.85rem; color:#555; margin-top:3px; }
+    .emp-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; margin-top:14px;
+    }
+    .emp-field .lbl { font-size:.7rem; color:#888; text-transform:uppercase; letter-spacing:.4px; }
+    .emp-field .val { font-weight:600; color:#1a3c6e; font-size:.88rem; margin-top:1px; }
+
+    /* ══ SALARY TABLE ══ */
+    .sal-section { margin-bottom:24px; }
+    .sal-section-title {
+      font-size:.75rem; font-weight:700; color:#888;
+      text-transform:uppercase; letter-spacing:.5px; margin-bottom:12px;
+    }
+
+    .sal-table {
+      width:100%; border-collapse:collapse; border-radius:10px; overflow:hidden;
+      border:1.5px solid #d0e8fb;
+    }
+    .sal-table thead tr {
+      background:linear-gradient(135deg,#1a3c6e,#2e86de);
+      color:#fff;
+    }
+    .sal-table thead th {
+      padding:10px 16px; font-size:.8rem; text-transform:uppercase;
+      letter-spacing:.5px; text-align:left; font-weight:700;
+    }
+    .sal-table thead th:last-child { text-align:right; }
+    .sal-table tbody tr:nth-child(odd)  { background:#f8fafd; }
+    .sal-table tbody tr:nth-child(even) { background:#fff; }
+    .sal-table tbody tr:hover { background:#eaf2fb; transition:background .2s; }
+    .sal-table tbody td {
+      padding:11px 16px; font-size:.88rem; color:#333;
+      border-bottom:1px solid #e8f0fb;
+    }
+    .sal-table tbody td:last-child { text-align:right; font-weight:600; color:#1a3c6e; }
+    .sal-table tfoot tr {
+      background:linear-gradient(135deg,#1a3c6e,#2e86de);
+      color:#fff;
+    }
+    .sal-table tfoot td {
+      padding:12px 16px; font-size:.9rem; font-weight:700; color:#fff;
+      border:none;
+    }
+    .sal-table tfoot td:last-child { text-align:right; }
+
+    /* Deduction badge */
+    .badge-nil {
+      display:inline-block; background:#e8f8f0; color:#27ae60;
+      font-size:.75rem; font-weight:700; padding:2px 8px;
+      border-radius:20px; border:1px solid #b2e8cc;
+    }
+
+    /* ══ NET PAY BANNER ══ */
+    .net-banner {
+      background:linear-gradient(135deg,#1a3c6e,#2e86de);
+      border-radius:12px; padding:18px 22px;
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:24px;
+    }
+    .net-banner .net-lbl { font-size:.88rem; color:rgba(255,255,255,.8); }
+    .net-banner .net-val { font-size:1.5rem; font-weight:800; color:#fff; }
+
+    /* ══ FORM ══ */
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    label { font-size:.75rem; font-weight:700; color:#1a3c6e; text-transform:uppercase; letter-spacing:.5px; }
+    select, input[type=number] {
+      padding:11px 14px; border:1.5px solid #d0d9e8; border-radius:8px;
+      font-size:.9rem; color:#222; background:#f8fafd;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    select:focus, input:focus {
+      outline:none; border-color:#2e86de;
+      box-shadow:0 0 0 3px rgba(46,134,222,.15); background:#fff;
+    }
+
+    .btn-gen {
+      width:100%; margin-top:18px; padding:14px;
+      background:linear-gradient(135deg,#1a3c6e,#2e86de);
+      color:#fff; border:none; border-radius:10px;
+      font-size:1rem; font-weight:700; cursor:pointer;
+      transition:opacity .2s, transform .1s; letter-spacing:.3px;
+    }
+    .btn-gen:hover   { opacity:.9; }
+    .btn-gen:active  { transform:scale(.98); }
+    .btn-gen:disabled { opacity:.45; cursor:not-allowed; }
+
+    .spinner {
+      display:inline-block; width:16px; height:16px;
+      border:2px solid rgba(255,255,255,.4); border-top-color:#fff;
+      border-radius:50%; animation:spin .7s linear infinite;
+      vertical-align:middle; margin-right:6px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .alert { padding:12px 16px; border-radius:8px; margin-top:12px; font-size:.88rem; display:none; }
+    .alert-error   { background:#fdecea; color:#c0392b; border-left:4px solid #e74c3c; }
+    .alert-success { background:#eafaf1; color:#1e8449; border-left:4px solid #27ae60; }
+
+    /* ══ FOOTER ══ */
+    footer {
+      text-align:center; padding:20px;
+      background:linear-gradient(to right,#9575cd,#7986cb);
+      color:#fff; font-size:13px; margin-top:20px;
+    }
+
+    /* ══ MODAL ══ */
+    .modal { display:none; position:fixed; z-index:2000; inset:0; background:rgba(0,0,0,.5); justify-content:center; align-items:center; }
+    .modal-content { background:#fff; padding:25px; border-radius:12px; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.3); width:320px; }
+    .modal-content h3 { margin-bottom:20px; color:#3949ab; }
+    .modal-actions button { margin:8px; padding:8px 20px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
+    .confirm-btn { background:#3949ab; color:white; }
+    .cancel-btn  { background:#f0f0f0; color:#333; }
+    .confirm-btn:hover { background:#303f9f; }
+    .cancel-btn:hover  { background:#ddd; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="logo">
+    <a href="{{ url_for('employee_resources') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Chakora Hub"></a>
+  </div>
+  <div class="center-text">
+    {% if festival_today %}🎉 Happy {{ festival_today }}! 🎉{% endif %}
+  </div>
+  <div class="profile-section">
+    <div class="reg-id">ID: {{ reg_id }}</div>
+    <div class="profile-wrapper" onclick="toggleDropdown()">
+      <img class="profile-pic"
+           src="{{ url_for('static', filename=(profile_pic if profile_pic else 'profile_photo/defaultpicture.jpg')) }}"
+           alt="Profile"/>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="{{ url_for('employee_resources') }}">🏠 Home</a>
+        <a href="#" onclick="showComingSoon()">Settings</a>
+        <a href="#" onclick="openModal()">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BODY ══ -->
+<div class="main-wrapper">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>EMPLOYEE RESOURCES</h3>
+    <a href="{{ url_for('employee_resources') }}">👤 Personal Details</a>
+    <a href="{{ url_for('employee_resources') }}">💰 Salary Information</a>
+    <a href="{{ url_for('employee_resources') }}">📆 Leave Tracker</a>
+    <a href="{{ url_for('employee_resources') }}">🪪 ID Card</a>
+    <a href="{{ url_for('employee_resources') }}">📨 Employee Queries</a>
+    <a href="{{ url_for('employee_appraisal') }}">📊 Employee Appraisal</a>
+    <a href="{{ url_for('pay_slip_page') }}" class="active">🧾 Pay Slip</a>
+    <a href="{{ url_for('dashboard') }}">🚀 360 Dashboard</a>
+    <a href="#" onclick="showComingSoon(); return false;">📝 Blogger</a>
+    <a href="{{ url_for('employee_calender') }}">📅 Calendar</a>
+    <a href="{{ url_for('meeting_home') }}">⏰ Meeting hours</a>
+    <a href="#" onclick="showComingSoon(); return false;">🗺️ Roadmap</a>
+    <a href="#" onclick="showComingSoon(); return false;">📜 COC</a>
+    <a href="#" onclick="showComingSoon(); return false;">🎁 Offers</a>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+    <div class="page-title">🧾 Pay Slip</div>
+    <div class="page-subtitle">Download your monthly salary slip as a PDF</div>
+
+    <div class="slip-card">
+      <div class="slip-card-header">
+        <h2>Generate Pay Slip</h2>
+        <p>Your salary details are loaded automatically — just pick the month &amp; year</p>
+      </div>
+      <div class="slip-card-body">
+
+        {% if emp %}
+
+        <!-- ── Employee Info ── -->
+        <div class="emp-block">
+          <div class="name">{{ emp.FULL_NAME }}</div>
+          <div class="role">{{ emp.DESIGNATION }}&nbsp;&nbsp;·&nbsp;&nbsp;{{ emp.DEPARTMENT }}</div>
+          <div class="emp-grid">
+            <div class="emp-field">
+              <div class="lbl">Employee ID</div>
+              <div class="val">{{ emp.EMPLOYEE_ID }}</div>
+            </div>
+            <div class="emp-field">
+              <div class="lbl">Date of Joining</div>
+              <div class="val">{{ emp.DATE_OF_JOINING }}</div>
+            </div>
+            <div class="emp-field">
+              <div class="lbl">Email</div>
+              <div class="val">{{ emp.EMAIL }}</div>
+            </div>
+            <div class="emp-field">
+              <div class="lbl">Phone</div>
+              <div class="val">{{ emp.PHONE }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Salary Breakdown ── -->
+        <div class="sal-section">
+          <div class="sal-section-title">Salary Breakdown</div>
+          <table class="sal-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Type</th>
+                <th>Amount (&#8377;)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Basic Salary</td>
+                <td>Earning</td>
+                <td>&#8377;{{ "{:,.2f}".format(emp.BASIC) }}</td>
+              </tr>
+              <tr>
+                <td>House Rent Allowance (HRA)</td>
+                <td>Earning</td>
+                <td>&#8377;{{ "{:,.2f}".format(emp.HRA) }}</td>
+              </tr>
+              <tr>
+                <td>Allowances</td>
+                <td>Earning</td>
+                <td>&#8377;{{ "{:,.2f}".format(emp.ALLOWANCES) }}</td>
+              </tr>
+              <tr>
+                <td>Deductions</td>
+                <td>Deduction</td>
+                <td>
+                  {% if emp.DEDUCTIONS == 0 %}
+                    <span class="badge-nil">NIL</span>
+                  {% else %}
+                    - &#8377;{{ "{:,.2f}".format(emp.DEDUCTIONS) }}
+                  {% endif %}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">Net Salary Payable</td>
+                <td>&#8377;{{ "{:,.2f}".format(emp.NET_SALARY) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- ── Net Pay Banner ── -->
+        <div class="net-banner">
+          <div class="net-lbl">Net Salary Payable</div>
+          <div class="net-val">&#8377;{{ "{:,.2f}".format(emp.NET_SALARY) }}</div>
+        </div>
+
+        {% else %}
+        <!-- ── Error Block ── -->
+        <div style="background:#fdecea;border-left:4px solid #e74c3c;border-radius:10px;
+                    padding:16px 20px;margin-bottom:24px;color:#c0392b;">
+          <strong>&#9888; Could not load salary data.</strong><br>
+          <span style="font-size:.87rem;">Please ensure your salary record exists in the system or contact HR.</span>
+        </div>
+        {% endif %}
+
+        <!-- ── Month / Year Selector ── -->
+        <form id="slipForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="month">Month</label>
+              <select id="month" name="month" required>
+                <option>January</option><option>February</option><option>March</option>
+                <option>April</option><option>May</option><option>June</option>
+                <option>July</option><option>August</option><option>September</option>
+                <option>October</option><option>November</option><option>December</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="year">Year</label>
+              <input type="number" id="year" name="year" min="2020" max="2099" required/>
+            </div>
+          </div>
+
+          <div class="alert alert-error"   id="errMsg"></div>
+          <div class="alert alert-success" id="okMsg"></div>
+
+          <button type="submit" class="btn-gen" id="genBtn"
+            {% if not emp %}disabled title="Salary data not available"{% endif %}>
+            &#128196; Generate &amp; Download PDF
+          </button>
+        </form>
+
+      </div><!-- /.slip-card-body -->
+    </div><!-- /.slip-card -->
+  </div><!-- /.content-area -->
+</div><!-- /.main-wrapper -->
+
+<footer>&#169; 2025 ChakoraHub. All rights reserved.</footer>
+
+<!-- LOGOUT MODAL -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <h3>Are you sure you want to log out?</h3>
+    <div class="modal-actions">
+      <button class="confirm-btn" onclick="doLogout()">Yes, Logout</button>
+      <button class="cancel-btn"  onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── Defaults ── */
+  const MONTHS = ["January","February","March","April","May","June",
+                  "July","August","September","October","November","December"];
+  const now = new Date();
+  document.getElementById('month').value = MONTHS[now.getMonth()];
+  document.getElementById('year').value  = now.getFullYear();
+
+  /* ── AJAX PDF download ── */
+  document.getElementById('slipForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const errEl = document.getElementById('errMsg');
+    const okEl  = document.getElementById('okMsg');
+    const btn   = document.getElementById('genBtn');
+
+    errEl.style.display = 'none';
+    okEl.style.display  = 'none';
+    btn.disabled  = true;
+    btn.innerHTML = '<span class="spinner"></span> Generating PDF...';
+
+    try {
+      const fd = new FormData();
+      fd.append('month', document.getElementById('month').value);
+      fd.append('year',  document.getElementById('year').value);
+
+      const res = await fetch('/generate_payslip', { method:'POST', body:fd });
+
+      if (!res.ok) {
+        let msg = 'Server error. Please try again.';
+        try { const j = await res.json(); msg = j.error || msg; } catch(_){}
+        throw new Error(msg);
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `PaySlip_{{ employee_id }}_${document.getElementById('month').value}_${document.getElementById('year').value}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      okEl.innerHTML  = '&#10004; Pay slip downloaded successfully!';
+      okEl.style.display = 'block';
+
+    } catch(err) {
+      errEl.innerHTML  = '&#10006; ' + err.message;
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled  = false;
+      btn.innerHTML = '&#128196; Generate &amp; Download PDF';
+    }
+  });
+
+  /* ── Coming Soon ── */
+  function showComingSoon() {
+    alert('This feature is coming soon!');
+  }
+
+  /* ── Header dropdown ── */
+  function toggleDropdown() {
+    const d = document.getElementById('dropdownMenu');
+    d.style.display = d.style.display === 'block' ? 'none' : 'block';
+  }
+  document.addEventListener('click', function(e) {
+    const pw = document.querySelector('.profile-wrapper');
+    if (pw && !pw.contains(e.target))
+      document.getElementById('dropdownMenu').style.display = 'none';
+  });
+
+  /* ── Logout Modal ── */
+  function openModal()  { document.getElementById('logoutModal').style.display='flex'; }
+  function closeModal() { document.getElementById('logoutModal').style.display='none'; }
+  function doLogout()   { window.location.href = "{{ url_for('Emp_logout') }}"; }
+</script>
+</body>
+</html>

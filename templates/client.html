@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal | ChakoraHub</title>
+
+<style>
+:root {
+  --primary: #6c63ff;
+  --bg-dark: linear-gradient(135deg, #2c2f6c, #3a235f);
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg-dark);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ===== BLURRED PAGE CONTENT ===== */
+.page-wrapper {
+  filter: blur(6px);
+  pointer-events: none;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.client-box {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border-left: 6px solid var(--primary);
+}
+
+.client-box h2 {
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.client-box p {
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.client-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.client-actions a {
+  width: 80%;
+  padding: 12px;
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.client-actions a:hover {
+  background: #5849c7;
+}
+
+/* ===== LOGIN MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.login-modal {
+  background: #fff;
+  width: 360px;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  text-align: center;
+}
+
+.login-modal h3 {
+  margin-bottom: 20px;
+}
+
+.login-modal input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+.login-modal button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-modal button:hover {
+  background: #5849c7;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== BLURRED CLIENT PAGE ===== -->
+<div class="page-wrapper">
+  <div class="client-box">
+    <h2>👤 Client Portal</h2>
+    <p>Secure access for client onboarding, signoff and tracking</p>
+
+    <div class="client-actions">
+      <a href="#">📄 Client Onboarding</a>
+      <a href="#">📝 Submit BRS</a>
+      <a href="#">✅ Client Signoff</a>
+      <a href="#">📊 Track Status</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN REQUIRED MODAL ===== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="login-modal">
+    <h3>🔒 Login Required</h3>
+
+    <input type="text" id="loginUser" placeholder="Email / Phone">
+    <input type="password" id="loginPass" placeholder="Password">
+
+    <button onclick="hardLogin()">Login</button>
+  </div>
+</div>
+
+<!-- ===== HARD-CODE LOGIN SCRIPT ===== -->
+<script>
+function hardLogin() {
+  const user = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value;
+
+  // 🔐 HARD-CODED CREDENTIALS
+  const HARD_USER = "client";
+  const HARD_PASS = "Client@123";
+
+  if (user === HARD_USER && pass === HARD_PASS) {
+    // Hide modal
+    document.getElementById("loginModal").style.display = "none";
+
+    // Remove blur and enable page
+    const page = document.querySelector(".page-wrapper");
+    page.style.filter = "none";
+    page.style.pointerEvents = "auto";
+  } else {
+    alert(
+      "Invalid credentials ❌\n\n" +
+      "Use:\n" +
+      "Username: client\n" +
+      "Password: Client@123"
+    );
+  }
+}
+</script>
+
+</body>
+</html>

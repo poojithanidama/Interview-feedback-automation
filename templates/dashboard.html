@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>360 Dashboard — ChakoraHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --bg-app: #ffffff;
+      --primary: #6534ff;
+      --primary-hover: #5226d9;
+      --text-dark: #1a1830;
+      --text-mid: #4a4869;
+      --text-gray: #9ba0b4;
+      --border-color: #f0f0f5;
+
+      /* Module accent colours — one per 360 card */
+      --c-finance:  #6534ff;
+      --c-elearn:   #05cd99;
+      --c-personal: #fe7d55;
+      --c-infra:    #78c0c4;
+
+      /* Card gradient seeds */
+      --grad-purple: linear-gradient(135deg, #6a347b 0%, #9b59b6 100%);
+      --grad-teal:   linear-gradient(135deg, #3bc7c0 0%, #78c0c4 100%);
+      --grad-orange: linear-gradient(135deg, #fe7d55 0%, #f0a070 100%);
+      --grad-pink:   linear-gradient(135deg, #ee5d50 0%, #f08070 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #4f46e5 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+    }
+
+    /* ─── TOP NAVBAR ─────────────────────────────────────── */
+    .top-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.97);
+      height: 72px;
+      padding: 0 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+    .nav-left img { height: 46px; border-radius: 10px; }
+    .nav-left h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-center { display: flex; align-items: center; gap: 6px; }
+
+    .nav-tab {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      user-select: none;
+      letter-spacing: -0.1px;
+    }
+    .nav-tab:hover { background: #f3f4f6; color: var(--text-dark); }
+    .nav-tab.active { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(101,52,255,0.3); }
+
+    .profile-section { display: flex; align-items: center; gap: 14px; }
+    .reg-id {
+      font-size: 13px; font-weight: 600; color: var(--text-mid);
+      background: #f3f4f6; padding: 6px 14px; border-radius: 8px;
+    }
+    .profile-wrapper { position: relative; cursor: pointer; }
+    .profile-pic {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2.5px solid var(--border-color); object-fit: cover;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .profile-wrapper:hover .profile-pic { border-color: var(--primary); transform: scale(1.05); }
+
+    .dropdown-menu {
+      display: none; position: absolute; top: 56px; right: 0;
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12); z-index: 1000; min-width: 180px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+    .dropdown-menu a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px; color: var(--text-mid);
+      font-weight: 500; font-size: 14px; text-decoration: none;
+      border-bottom: 1px solid #f5f5f8; transition: background 0.15s;
+    }
+    .dropdown-menu a:last-child { border-bottom: none; }
+    .dropdown-menu a:hover { background: #f7f7fb; color: var(--text-dark); }
+    .dropdown-menu a i { width: 16px; text-align: center; color: var(--text-gray); font-size: 13px; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .app-layout {
+      display: flex; flex: 1;
+      padding: 18px 22px 18px;
+      max-width: 1600px; margin: 0 auto; width: 100%;
+      height: calc(100vh - 72px);
+    }
+
+    .app-window {
+      background: var(--bg-app);
+      flex: 1; border-radius: 20px;
+      box-shadow: 0 16px 60px rgba(0,0,0,0.15);
+      display: flex; flex-direction: column;
+      position: relative; overflow: hidden;
+      min-height: 0;
+    }
+
+    .main-wrapper {
+      flex: 1; display: flex; flex-direction: column;
+      overflow-y: visible; position: relative; z-index: 1;
+      min-height: 0;
+    }
+
+    /* Bottom decorative blob */
+    .bottom-blob {
+      position: absolute; bottom: -40px; left: -40px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(120,192,196,0.35) 0%, transparent 70%);
+      border-radius: 50%; z-index: 0; pointer-events: none;
+    }
+
+    .main-wrapper {
+      flex: 1; display: flex; flex-direction: column;
+      overflow-y: auto; position: relative; z-index: 1; height: 100%;
+    }
+
+    /* ─── MODULE CONTAINERS ──────────────────────────────── */
+    .module-container {
+      display: none; flex: 1; flex-direction: column;
+      animation: fadeUp 0.35s ease both; height: 100%;
+    }
+    .module-container.active { display: flex; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── WELCOME / DASHBOARD MODULE ────────────────────── */
+    .dashboard-header {
+      background: linear-gradient(120deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+      padding: 36px 40px 30px;
+      position: relative; overflow: hidden;
+      /* Sticky removed — header now scrolls naturally with page content */
+    }
+    .dashboard-header::after {
+      content: '';
+      position: absolute; right: -60px; top: -60px;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 65%);
+      border-radius: 50%;
+    }
+    .header-greeting {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px; font-weight: 700; color: #fff;
+      margin-bottom: 6px; letter-spacing: -0.5px;
+    }
+    .header-sub { color: #a5b4fc; font-size: 14px; font-weight: 500; }
+    .header-meta {
+      margin-top: 18px;
+      display: flex; gap: 20px;
+    }
+    .header-chip {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #c7d2fe; font-size: 12px; font-weight: 600;
+      padding: 6px 14px; border-radius: 20px;
+      display: flex; align-items: center; gap: 7px;
+    }
+
+    /* ─── MAIN DASHBOARD CONTENT ────────────────────────── */
+    .dashboard-content {
+      padding: 28px 32px 32px;
+      display: flex; flex-direction: column; gap: 24px;
+      overflow-y: auto; flex: 1;
+    }
+
+    /* Stat cards row */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .stat-card {
+      border-radius: 18px; padding: 22px 22px 18px;
+      color: #fff; position: relative; overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.14); }
+    .stat-card::before {
+      content: ''; position: absolute;
+      top: -40px; right: -40px;
+      width: 130px; height: 130px;
+      background: rgba(255,255,255,0.08); border-radius: 50%;
+    }
+
+    .card-purple { background: var(--grad-purple); }
+    .card-teal   { background: var(--grad-teal);   }
+    .card-orange { background: var(--grad-orange); }
+    .card-pink   { background: var(--grad-pink);   }
+
+    .stat-card .card-icon {
+      font-size: 22px; margin-bottom: 12px; opacity: 0.85;
+    }
+    .stat-card h4 {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; opacity: 0.75; margin-bottom: 6px;
+    }
+    .stat-card .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px; font-weight: 700; line-height: 1;
+      margin-bottom: 6px; letter-spacing: -0.5px;
+    }
+    .stat-card .stat-label {
+      font-size: 12px; font-weight: 500; opacity: 0.7; line-height: 1.4;
+    }
+    .stat-card .stat-arrow {
+      position: absolute; bottom: 18px; right: 18px;
+      font-size: 12px; opacity: 0.5;
+    }
+
+    /* 360 Summary panels grid */
+    .panels-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      flex: 1;
+    }
+
+    .panel-360 {
+      background: #fff; border-radius: 18px;
+      border: 1px solid var(--border-color);
+      padding: 22px 24px;
+      display: flex; flex-direction: column; gap: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+      transition: box-shadow 0.25s, transform 0.25s;
+      cursor: pointer; text-decoration: none;
+    }
+    .panel-360:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.08); transform: translateY(-3px); }
+
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-badge {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .badge-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: grid; place-items: center; font-size: 16px;
+    }
+    .badge-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--text-dark);
+    }
+    .badge-sub { font-size: 12px; color: var(--text-gray); font-weight: 500; }
+
+    .panel-open-btn {
+      font-size: 11px; font-weight: 600; padding: 5px 12px;
+      border-radius: 8px; border: 1.5px solid var(--border-color);
+      color: var(--text-gray); background: transparent;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .panel-open-btn:hover { border-color: currentColor; }
+
+    .panel-rows { display: flex; flex-direction: column; gap: 8px; }
+    .panel-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 12px; border-radius: 10px; background: #fafafa;
+    }
+    .row-key { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.4px; }
+    .row-val { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+
+    .progress-mini {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .progress-mini-bar {
+      flex: 1; height: 6px; background: #f0f0f5; border-radius: 3px; overflow: hidden;
+    }
+    .progress-mini-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+    .progress-mini-pct { font-size: 12px; font-weight: 700; color: var(--text-mid); min-width: 32px; text-align: right; }
+
+    /* ─── IFRAME MODULES ─────────────────────────────────── */
+    .module-iframe {
+      width: 100%; height: 100%; border: none;
+      background: transparent; display: block;
+    }
+
+    /* ─── STATUS PILLS ───────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .pill-green { background: #e6fdf5; color: #05cd99; }
+    .pill-gray  { background: #f0f0f5; color: var(--text-gray); }
+
+    /* ─── SCROLLBAR ──────────────────────────────────────── */
+    .main-wrapper::-webkit-scrollbar,
+    .dashboard-content::-webkit-scrollbar { width: 5px; }
+    .main-wrapper::-webkit-scrollbar-track,
+    .dashboard-content::-webkit-scrollbar-track { background: transparent; }
+    .main-wrapper::-webkit-scrollbar-thumb,
+    .dashboard-content::-webkit-scrollbar-thumb { background: #e0e0e8; border-radius: 4px; }
+
+    /* ─── LOADING SKELETON ───────────────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f5 25%, #e8e8ef 50%, #f0f0f5 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .panels-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-center { display: none; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ TOP NAVIGATION BAR ═══════════════════════════════════ -->
+  <nav class="top-navbar">
+    <div class="nav-left" onclick="showModule('welcome')">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="ChakoraHub Logo">
+      <h2>ChakoraHub</h2>
+    </div>
+
+    <div class="nav-center">
+      <div class="nav-tab active" data-nav="welcome"    onclick="showModule('welcome')">Dashboard</div>
+      <div class="nav-tab" data-nav="elearn360"         onclick="showModule('elearn360')">E-Learn 360</div>
+      <div class="nav-tab" data-nav="personal360"       onclick="showModule('personal360')">Personal 360</div>
+      <div class="nav-tab" data-nav="finance360"        onclick="showModule('finance360')">Finance 360</div>
+      <div class="nav-tab" data-nav="infra360"          onclick="showModule('infra360')">Infra 360</div>
+    </div>
+
+    <div class="profile-section">
+      <span class="reg-id">ID: {{ employee_id or 'N/A' }}</span>
+      <div class="profile-wrapper" onclick="toggleDropdown()">
+        <img class="profile-pic"
+          src="{{ url_for('static', filename=(profile_pic if profile_pic else 'profile_photo/defaultpicture.jpg')) }}"
+          alt="Profile" />
+        <div class="dropdown-menu" id="dropdownMenu">
+          <a href="/profile"><i class="fa-solid fa-user"></i> Profile</a>
+          <a href="/settings"><i class="fa-solid fa-gear"></i> Settings</a>
+          <a href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN APP LAYOUT ═══════════════════════════════════════ -->
+  <div class="app-layout">
+    <div class="app-window">
+      <div class="bottom-blob"></div>
+
+      <div class="main-wrapper">
+        {# ─── Always-available context defaults ─── #}
+        {% set dash = dashboard_summary | default({}) %}
+        {% set fin   = dash.finance   | default({}) %}
+        {% set learn = dash.elearn    | default({}) %}
+        {% set pers  = dash.personal  | default({}) %}
+        {% set infr  = dash.infra     | default({}) %}
+
+        <!-- ══ WELCOME / DASHBOARD MODULE ═════════════════════ -->
+        <div id="welcome" class="module-container active">
+
+          <!-- Header Banner -->
+          <header class="dashboard-header">
+            <div class="header-greeting">
+              Hello, {{ (employee_name or 'Employee').split(' ')[0] }} 👋
+            </div>
+            <p class="header-sub">
+              Your 360° employee snapshot — finance, learning, profile and infrastructure at a glance.
+            </p>
+            <div class="header-meta">
+              <span class="header-chip">
+                <i class="fa-solid fa-building"></i>
+                {{ pers.department | default('N/A') }}
+              </span>
+              <span class="header-chip">
+                <i class="fa-solid fa-user-tie"></i>
+                {{ pers.designation | default('N/A') }}
+              </span>
+              <span class="header-chip">
+                <i class="fa-regular fa-calendar"></i>
+                {{ current_datetime | default('') }}
+              </span>
+            </div>
+          </header>
+
+          <div class="dashboard-content">
+
+            <!-- ── 4 KPI Stat Cards ── -->
+            <div class="stats-grid">
+
+              <!-- Finance: Net Salary -->
+              <div class="stat-card card-purple" onclick="showModule('finance360')">
+                <div class="card-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                <h4>Net Salary</h4>
+                <div class="stat-value">
+                  ₹ {{ fin.net_salary | default('—') }}
+                </div>
+                <div class="stat-label">
+                  Basic: ₹ {{ fin.basic | default('—') }}
+                </div>
+                <span class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+              </div>
+
+              <!-- E-Learn: Active Courses -->
+              <div class="stat-card card-teal" onclick="showModule('elearn360')">
+                <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h4>Active Courses</h4>
+                <div class="stat-value">
+                  {{ learn.active_courses | default(0) }}
+                </div>
+                <div class="stat-label">
+                  {{ learn.videos_count | default(0) }} videos available
+                </div>
+                <span class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+              </div>
+
+              <!-- E-Learn: Learning Progress -->
+              <div class="stat-card card-orange" onclick="showModule('elearn360')">
+                <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <h4>Learning Progress</h4>
+                <div class="stat-value">
+                  {{ learn.learning_progress | default(0) }}%
+                </div>
+                <div class="stat-label">
+                  Avg. across {{ learn.skills_count | default(0) }} skills
+                </div>
+                <span class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+              </div>
+
+              <!-- Infra: Asset Status -->
+              <div class="stat-card card-pink" onclick="showModule('infra360')">
+                <div class="card-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                <h4>My Asset</h4>
+                <div class="stat-value" style="font-size:18px; margin-top:4px;">
+                  {{ infr.asset_type | default('No Asset') }}
+                </div>
+                <div class="stat-label">
+                  Status: {{ infr.status | default('N/A') }}
+                </div>
+                <span class="stat-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+              </div>
+
+            </div>
+
+            <!-- ── 360 Module Summary Panels ── -->
+            <div class="panels-grid">
+
+              <!-- Personal 360 Panel -->
+              <div class="panel-360" onclick="showModule('personal360')">
+                <div class="panel-head">
+                  <div class="panel-badge">
+                    <div class="badge-icon" style="background:rgba(254,125,85,0.12); color:#fe7d55;">
+                      <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                      <div class="badge-label">Personal 360</div>
+                      <div class="badge-sub">Profile & leave summary</div>
+                    </div>
+                  </div>
+                  <button class="panel-open-btn" style="color:#fe7d55; border-color:rgba(254,125,85,0.3);">View →</button>
+                </div>
+                <div class="panel-rows">
+                  <div class="panel-row">
+                    <span class="row-key">Department</span>
+                    <span class="row-val">{{ pers.department | default('N/A') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Designation</span>
+                    <span class="row-val">{{ pers.designation | default('N/A') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Status</span>
+                    <span class="row-val">
+                      <span class="pill {{ 'pill-green' if pers.status == 'Active' else 'pill-gray' }}">
+                        {{ pers.status | default('Unknown') }}
+                      </span>
+                    </span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Leave Balance</span>
+                    <span class="row-val">{{ pers.leave_count | default(0) }} records</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Finance 360 Panel -->
+              <div class="panel-360" onclick="showModule('finance360')">
+                <div class="panel-head">
+                  <div class="panel-badge">
+                    <div class="badge-icon" style="background:rgba(101,52,255,0.1); color:#6534ff;">
+                      <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                      <div class="badge-label">Finance 360</div>
+                      <div class="badge-sub">Salary & slip history</div>
+                    </div>
+                  </div>
+                  <button class="panel-open-btn" style="color:#6534ff; border-color:rgba(101,52,255,0.25);">View →</button>
+                </div>
+                <div class="panel-rows">
+                  <div class="panel-row">
+                    <span class="row-key">Basic Pay</span>
+                    <span class="row-val">₹ {{ fin.basic | default('—') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">HRA</span>
+                    <span class="row-val">₹ {{ fin.hra | default('—') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Net Salary</span>
+                    <span class="row-val" style="color:#6534ff; font-size:15px;">₹ {{ fin.net_salary | default('—') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Slip History</span>
+                    <span class="row-val">{{ fin.slips_count | default(0) }} slips</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- E-Learn 360 Panel -->
+              <div class="panel-360" onclick="showModule('elearn360')">
+                <div class="panel-head">
+                  <div class="panel-badge">
+                    <div class="badge-icon" style="background:rgba(5,205,153,0.1); color:#05cd99;">
+                      <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                      <div class="badge-label">E-Learn 360</div>
+                      <div class="badge-sub">Courses & certifications</div>
+                    </div>
+                  </div>
+                  <button class="panel-open-btn" style="color:#05cd99; border-color:rgba(5,205,153,0.25);">View →</button>
+                </div>
+                <div class="panel-rows">
+                  <div class="panel-row">
+                    <span class="row-key">Skills Tracked</span>
+                    <span class="row-val">{{ learn.skills_count | default(0) }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Certifications</span>
+                    <span class="row-val">{{ learn.certs_count | default(0) }} docs</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Overall Progress</span>
+                    <span class="row-val">
+                      <div class="progress-mini">
+                        <div class="progress-mini-bar">
+                          <div class="progress-mini-fill"
+                               style="background:#05cd99;"
+                               data-width="{{ learn.learning_progress | default(0) }}">
+                          </div>
+                        </div>
+                        <span class="progress-mini-pct">{{ learn.learning_progress | default(0) }}%</span>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Subjects</span>
+                    <span class="row-val">{{ learn.subjects_count | default(0) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Infra 360 Panel -->
+              <div class="panel-360" onclick="showModule('infra360')">
+                <div class="panel-head">
+                  <div class="panel-badge">
+                    <div class="badge-icon" style="background:rgba(120,192,196,0.15); color:#4a8a8e;">
+                      <i class="fa-solid fa-server"></i>
+                    </div>
+                    <div>
+                      <div class="badge-label">Infra 360</div>
+                      <div class="badge-sub">Assets & IT helpdesk</div>
+                    </div>
+                  </div>
+                  <button class="panel-open-btn" style="color:#4a8a8e; border-color:rgba(120,192,196,0.35);">View →</button>
+                </div>
+                <div class="panel-rows">
+                  <div class="panel-row">
+                    <span class="row-key">Asset Type</span>
+                    <span class="row-val">{{ infr.asset_type | default('None assigned') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Serial / Tag</span>
+                    <span class="row-val">{{ infr.serial_number | default('N/A') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Allocation Date</span>
+                    <span class="row-val">{{ infr.allocation_date | default('N/A') }}</span>
+                  </div>
+                  <div class="panel-row">
+                    <span class="row-key">Open Tickets</span>
+                    <span class="row-val">{{ infr.open_tickets | default(0) }}</span>
+                  </div>
+                </div>
+              </div>
+
+            </div> <!-- /panels-grid -->
+
+          </div> <!-- /dashboard-content -->
+        </div> <!-- /welcome module -->
+
+        <!-- ══ IFRAME MODULE CONTAINERS ═══════════════════════ -->
+        <div id="elearn360"   class="module-container">
+          <iframe src="/elearn360"   class="module-iframe" title="E-Learn 360"></iframe>
+        </div>
+        <div id="personal360" class="module-container">
+          <iframe src="/personal360" class="module-iframe" title="Personal 360"></iframe>
+        </div>
+        <div id="finance360"  class="module-container">
+          <iframe src="/finance360"  class="module-iframe" title="Finance 360"></iframe>
+        </div>
+        <div id="infra360"    class="module-container">
+          <iframe src="/infra360"    class="module-iframe" title="Infra 360"></iframe>
+        </div>
+
+      </div> <!-- /main-wrapper -->
+    </div> <!-- /app-window -->
+  </div> <!-- /app-layout -->
+
+  <script>
+    /* ── Profile Dropdown ───────────────────────────────── */
+    function toggleDropdown() {
+      const d = document.getElementById('dropdownMenu');
+      d.style.display = d.style.display === 'block' ? 'none' : 'block';
+    }
+    document.addEventListener('click', e => {
+      const pw = document.querySelector('.profile-wrapper');
+      if (pw && !pw.contains(e.target)) {
+        document.getElementById('dropdownMenu').style.display = 'none';
+      }
+    });
+
+    /* ── Module Navigation ──────────────────────────────── */
+    function showModule(moduleId) {
+      const url = new URL(window.location);
+      url.searchParams.set('module', moduleId);
+      window.history.pushState({}, '', url);
+
+      document.querySelectorAll('.module-container').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById(moduleId);
+      const tab    = document.querySelector(`[data-nav="${moduleId}"]`);
+      if (target) target.classList.add('active');
+      if (tab)    tab.classList.add('active');
+    }
+
+    /* ── Animate progress bars on load ─────────────────── */
+    function animateProgressBars() {
+      document.querySelectorAll('.progress-mini-fill[data-width]').forEach(el => {
+        const w = parseFloat(el.dataset.width) || 0;
+        el.style.width = '0%';
+        setTimeout(() => { el.style.width = w + '%'; }, 300);
+      });
+    }
+
+    /* ── Init ───────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      animateProgressBars();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const module = urlParams.get('module') || 'welcome';
+      showModule(module);
+    });
+
+    window.addEventListener('popstate', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      showModule(urlParams.get('module') || 'welcome');
+    });
+  </script>
+
+</body>
+</html>
