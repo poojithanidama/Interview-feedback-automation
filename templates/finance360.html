@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Finance 360 — ChakoraHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary:   #6534ff;
+      --primary-d: #5226d9;
+      --text-dark: #1a1830;
+      --text-mid:  #4a4869;
+      --text-gray: #9ba0b4;
+      --border:    #f0f0f5;
+      --bg:        #ffffff;
+      --radius:    18px;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg); color:var(--text-dark);
+      min-height:100vh; -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── Embedded ──────────────────────────────── */
+    body.embedded { background:transparent !important; }
+    body.embedded .sidebar { background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); }
+    body.embedded .topbar  { display:none !important; }
+    body.embedded .layout  { min-height:100vh; }
+
+    /* ── Topbar ─────────────────────────────────── */
+    .topbar {
+      position:sticky; top:0; z-index:20;
+      background:#fff; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-badge {
+      width:42px; height:42px; border-radius:12px;
+      background:linear-gradient(135deg,#6534ff,#5226d9);
+      display:grid; place-items:center; color:#fff; font-size:17px;
+    }
+    .brand-text strong { display:block; font-family:'Space Grotesk',sans-serif; font-size:17px; color:var(--text-dark); letter-spacing:-0.2px; }
+    .brand-text span   { color:var(--text-gray); font-size:12px; font-weight:500; }
+    .profile-area { display:flex; align-items:center; gap:12px; }
+    .avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:#1a1830; display:grid; place-items:center;
+      color:#fff; font-weight:700; font-size:15px;
+      border:2px solid var(--border); transition:border-color .2s;
+    }
+    .avatar:hover { border-color:var(--primary); }
+    .profile-info { text-align:right; }
+    .profile-info strong { display:block; font-size:13px; color:var(--text-dark); }
+    .profile-info span   { font-size:12px; color:var(--text-gray); }
+
+    /* ── Layout ─────────────────────────────────── */
+    .layout { display:flex; min-height:calc(100vh - 73px); }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    .sidebar {
+      width:234px; flex-shrink:0;
+      background:var(--bg); border-right:1px solid var(--border);
+      padding:28px 18px; display:flex; flex-direction:column; gap:2px;
+      position:sticky; top:73px; height:calc(100vh - 73px); overflow-y:auto;
+    }
+    .sl {
+      font-size:10px; font-weight:700; letter-spacing:0.8px;
+      text-transform:uppercase; color:var(--text-gray);
+      padding:14px 10px 6px; margin-top:4px;
+    }
+    .nav-item {
+      display:flex; align-items:center; gap:11px;
+      padding:10px 14px; border-radius:12px;
+      color:var(--text-gray); cursor:pointer;
+      font-size:13px; font-weight:600;
+      border:none; background:none; width:100%; text-align:left;
+      transition:all .2s ease; position:relative;
+    }
+    .nav-item .ni { width:22px; font-size:14px; text-align:center; flex-shrink:0; transition:color .2s; }
+    .nav-item:hover { color:var(--text-dark); background:rgba(101,52,255,0.07); }
+    .nav-item:hover .ni { color:var(--primary); }
+    .nav-item.active { background:rgba(101,52,255,0.1); color:var(--primary-d); font-weight:700; }
+    .nav-item.active .ni { color:var(--primary); }
+    .nav-item.active::before {
+      content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+      width:3px; height:55%; background:var(--primary); border-radius:0 3px 3px 0;
+    }
+
+    /* ── Main ────────────────────────────────────── */
+    .main { flex:1; padding:36px 36px 40px; overflow-y:auto; }
+    .section { display:none; }
+    .section.active { display:block; animation:fadeUp .32s ease both; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Hero banner ─────────────────────────────── */
+    .hero-banner {
+      border-radius:var(--radius);
+      background:linear-gradient(120deg,#0d0620 0%,#1e0f40 55%,#180840 100%);
+      padding:32px 36px; color:#fff; position:relative; overflow:hidden;
+      margin-bottom:28px;
+    }
+    .hero-banner::before {
+      content:''; position:absolute; right:-80px; top:-80px;
+      width:300px; height:300px;
+      background:radial-gradient(circle,rgba(101,52,255,0.2) 0%,transparent 65%);
+      border-radius:50%;
+    }
+    .hero-inner { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .hero-text h2 { font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:700; margin-bottom:8px; letter-spacing:-0.4px; }
+    .hero-text p  { font-size:13px; color:rgba(255,255,255,0.6); font-weight:500; }
+    .hero-net {
+      text-align:right;
+    }
+    .hero-net .net-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
+    .hero-net .net-value {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:32px; font-weight:700; letter-spacing:-1px;
+      background:linear-gradient(135deg,#a78bfa,#c4b5fd);
+      background-clip:text;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    /* ── Stat cards ──────────────────────────────── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:20px;
+      transition:transform .22s ease, box-shadow .22s ease;
+    }
+    .stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.07); }
+    .stat-icon { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; font-size:16px; color:#fff; margin-bottom:14px; }
+    .stat-value { font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; color:var(--text-dark); margin-bottom:4px; letter-spacing:-0.5px; }
+    .stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-gray); }
+
+    /* ── Panel ───────────────────────────────────── */
+    .panel {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:24px;
+      margin-bottom:24px; box-shadow:0 2px 12px rgba(0,0,0,0.03);
+    }
+    .panel-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);
+    }
+    .panel-title { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:var(--text-dark); display:flex; align-items:center; gap:9px; }
+    .panel-title i { font-size:13px; color:var(--text-gray); }
+    .section-header { margin-bottom:28px; }
+    .page-title    { font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700; color:var(--text-dark); letter-spacing:-0.3px; margin-bottom:4px; }
+    .page-subtitle { font-size:13px; color:var(--text-gray); font-weight:500; }
+
+    /* ── Summary grid ────────────────────────────── */
+    .summary-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .summary-item {
+      padding:18px 20px; border-radius:12px;
+      background:#fafafa; border:1px solid var(--border);
+      display:flex; flex-direction:column; gap:6px;
+      transition:background .2s;
+    }
+    .summary-item:hover { background:#f4f4fb; }
+    .summary-item label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-gray); }
+    .summary-item strong { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:var(--text-dark); }
+    .summary-item.highlight strong { color:var(--primary); }
+
+    /* ── Tables ──────────────────────────────────── */
+    table { width:100%; border-collapse:collapse; }
+    thead th {
+      text-align:left; padding:11px 14px;
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+      color:var(--text-gray); border-bottom:2px solid var(--border);
+    }
+    tbody td {
+      padding:14px; font-size:13px; font-weight:500;
+      color:var(--text-dark); border-bottom:1px solid var(--border);
+    }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover td { background:rgba(101,52,255,0.03); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    /* ── Badges ──────────────────────────────────── */
+    .badge { display:inline-flex; align-items:center; padding:5px 11px; border-radius:20px; font-size:11px; font-weight:700; }
+    .b-green  { background:rgba(5,205,153,0.12); color:#02a479; }
+    .b-amber  { background:rgba(254,125,85,0.14); color:#fe7d55; }
+    .b-purple { background:rgba(101,52,255,0.1);  color:var(--primary); }
+    .b-gray   { background:#f0f0f5; color:var(--text-gray); }
+
+    /* ── Upload zone ─────────────────────────────── */
+    .upload-zone { position:relative; width:100%; }
+    .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2; }
+    .upload-face {
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:10px; padding:28px;
+      border:2px dashed var(--border); border-radius:12px;
+      background:#fafafa; transition:border-color .2s, background .2s;
+    }
+    .upload-face .up-icon {
+      width:42px; height:42px; border-radius:12px;
+      background:rgba(101,52,255,0.08); display:grid; place-items:center;
+      font-size:16px; color:var(--primary);
+    }
+    .upload-face .up-main { font-size:13px; font-weight:600; color:var(--text-dark); }
+    .upload-zone:hover .upload-face { border-color:var(--primary); background:rgba(101,52,255,0.04); }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:10px 20px; border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+      cursor:pointer; border:none; transition:all .2s ease;
+    }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:var(--primary-d); transform:translateY(-1px); box-shadow:0 4px 12px rgba(101,52,255,0.3); }
+    .btn-outline { background:transparent; color:var(--text-mid); border:1.5px solid var(--border); }
+    .btn-outline:hover { background:#fafafa; border-color:#d0d0dc; }
+
+    /* ── Form ────────────────────────────────────── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .form-group { display:flex; flex-direction:column; gap:7px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:11px; font-weight:700; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px; }
+    input, select {
+      width:100%; padding:10px 14px;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+      color:var(--text-dark); background:#fff; outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(101,52,255,0.12); }
+
+    /* ── Scrollbar ───────────────────────────────── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#e0e0e8; border-radius:4px; }
+
+    @media(max-width:900px) { .stats-grid { grid-template-columns:repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+      <div class="brand-text">
+        <strong>Finance 360</strong>
+        <span>Employee financial dashboard</span>
+      </div>
+    </div>
+    <div class="profile-area">
+      <div class="profile-info">
+        <strong>{{ employee_name or 'Employee' }}</strong>
+        <span>ID: {{ employee_id or 'N/A' }}</span>
+      </div>
+      <div class="avatar">{{ (employee_name or 'E')[0] }}</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sl">Sections</div>
+      <button class="nav-item active" onclick="showSection('overview',this)">
+        <span class="ni"><i class="fa-solid fa-chart-pie"></i></span> Overview
+      </button>
+      <button class="nav-item" onclick="showSection('salary',this)">
+        <span class="ni"><i class="fa-solid fa-file-invoice-dollar"></i></span> Salary Slip
+      </button>
+      <button class="nav-item" onclick="showSection('history',this)">
+        <span class="ni"><i class="fa-solid fa-clock-rotate-left"></i></span> Slip History
+      </button>
+      <button class="nav-item" onclick="showSection('upload',this)">
+        <span class="ni"><i class="fa-solid fa-arrow-up-from-bracket"></i></span> Upload Slip
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- ══ OVERVIEW ══════════════════════════════ -->
+      <div class="section active" id="sec-overview">
+
+        <div class="hero-banner">
+          <div class="hero-inner">
+            <div class="hero-text">
+              <h2>Finance Overview</h2>
+              <p>{{ department or 'N/A' }} &nbsp;·&nbsp; {{ designation or 'N/A' }}</p>
+            </div>
+            <div class="hero-net">
+              <div class="net-label">Net Salary</div>
+              <div class="net-value">₹ {{ salary.get('NET_SALARY', '—') if salary else '—' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fe7d55,#e0623a);">
+              <i class="fa-solid fa-building"></i>
+            </div>
+            <div class="stat-value" style="font-size:17px;">{{ department or 'N/A' }}</div>
+            <div class="stat-label">Department</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#05cd99,#02a479);">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="stat-value">₹ {{ salary.get('BASIC', '—') if salary else '—' }}</div>
+            <div class="stat-label">Basic Pay</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#6534ff,#5226d9);">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div class="stat-value">₹ {{ salary.get('NET_SALARY', '—') if salary else '—' }}</div>
+            <div class="stat-label">Net Salary</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#6a347b,#9b59b6);">
+              <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <div class="stat-value">{{ slips | length if slips else 0 }}</div>
+            <div class="stat-label">Salary Slips</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-table-list"></i> Salary Breakdown</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-gray);">From EMP_NRM_SALARY</span>
+          </div>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <label>Basic Pay</label>
+              <strong>₹ {{ salary.get('BASIC', 0) if salary else 0 }}</strong>
+            </div>
+            <div class="summary-item">
+              <label>HRA</label>
+              <strong>₹ {{ salary.get('HRA', 0) if salary else 0 }}</strong>
+            </div>
+            <div class="summary-item">
+              <label>Allowances</label>
+              <strong>₹ {{ salary.get('ALLOWANCES', 0) if salary else 0 }}</strong>
+            </div>
+            <div class="summary-item">
+              <label>Deductions</label>
+              <strong>₹ {{ salary.get('DEDUCTIONS', 0) if salary else 0 }}</strong>
+            </div>
+            <div class="summary-item highlight" style="grid-column:1/-1;">
+              <label>Net Salary (Take-home)</label>
+              <strong>₹ {{ salary.get('NET_SALARY', 0) if salary else 0 }}</strong>
+            </div>
+          </div>
+          <p style="color:var(--text-gray); margin-top:18px; font-size:12px; font-weight:500; line-height:1.6;">
+            Salary values are loaded directly from the payroll tables. If no record appears, please contact HR.
+          </p>
+        </div>
+      </div>
+
+      <!-- ══ LATEST SALARY SLIP ════════════════════ -->
+      <div class="section" id="sec-salary">
+        <div class="section-header">
+          <div class="page-title">Latest Salary Slip</div>
+          <div class="page-subtitle">Most recent slip from EMP_NRM_SALARY_SLIPS.</div>
+        </div>
+
+        {% if slips %}
+          {% set latest = slips[0] %}
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><i class="fa-solid fa-file-invoice-dollar"></i> Slip Details</div>
+              <!-- Download PDF button hidden — PDF generation pending implementation -->
+            </div>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <label>Period</label>
+                <strong>{{ latest.MONTH or latest.month or 'N/A' }} / {{ latest.YEAR or latest.year or 'N/A' }}</strong>
+              </div>
+              <div class="summary-item">
+                <label>Generated At</label>
+                <strong>{{ latest.GENERATED_AT or latest.generated_at or 'N/A' }}</strong>
+              </div>
+              <div class="summary-item">
+                <label>Slip ID</label>
+                <strong>{{ latest.SLIP_ID or latest.slip_id or 'N/A' }}</strong>
+              </div>
+              <div class="summary-item">
+                <label>File</label>
+                <strong style="font-size:13px; font-weight:500; color:var(--text-gray); word-break:break-all;">
+                  {{ latest.FILE_PATH or latest.file_path or 'Not available' }}
+                </strong>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="panel">
+            <div style="padding:36px; text-align:center; color:var(--text-gray);">
+              <i class="fa-solid fa-file-invoice-dollar" style="font-size:32px; margin-bottom:12px; opacity:0.35;"></i>
+              <p style="font-size:13px; font-weight:500;">No salary slips found for this employee yet.</p>
+              <button class="btn btn-primary" style="margin-top:16px;" onclick="showSection('upload', document.querySelectorAll('.nav-item')[3])">
+                <i class="fa-solid fa-upload"></i> Upload Slip
+              </button>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ══ SLIP HISTORY ══════════════════════════ -->
+      <div class="section" id="sec-history">
+        <div class="section-header">
+          <div class="page-title">Salary Slip History</div>
+          <div class="page-subtitle">All records from EMP_NRM_SALARY_SLIPS.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> All Slips</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-gray);">
+              {{ slips | length if slips else 0 }} records
+            </span>
+          </div>
+          {% if slips %}
+          <table>
+            <thead>
+              <tr><th>Slip ID</th><th>Month</th><th>Year</th><th>Generated At</th><th>File</th></tr>
+            </thead>
+            <tbody>
+              {% for slip in slips %}
+              <tr>
+                <td style="font-weight:600;">{{ slip.SLIP_ID or slip.slip_id }}</td>
+                <td>{{ slip.MONTH or slip.month }}</td>
+                <td>{{ slip.YEAR  or slip.year }}</td>
+                <td>{{ slip.GENERATED_AT or slip.generated_at }}</td>
+                <td>
+                  {% set fp = slip.FILE_PATH or slip.file_path or '' %}
+                  {% if fp %}
+                    <span class="badge b-green"><i class="fa-solid fa-paperclip"></i> Attached</span>
+                  {% else %}
+                    <span class="badge b-gray">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div style="padding:30px 0; text-align:center; color:var(--text-gray);">
+            <i class="fa-solid fa-inbox" style="font-size:28px; margin-bottom:10px; opacity:0.4;"></i>
+            <p style="font-size:13px; font-weight:500;">Salary slip history is empty.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ══ UPLOAD SLIP ════════════════════════════ -->
+      <div class="section" id="sec-upload">
+        <div class="section-header">
+          <div class="page-title">Upload Salary Slip</div>
+          <div class="page-subtitle">Upload a PDF salary slip — saved to S3 and recorded in the database.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-arrow-up-from-bracket"></i> New Upload</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <div class="upload-zone">
+                <input type="file" id="slip-file" accept=".pdf,.jpg,.png">
+                <div class="upload-face">
+                  <div class="up-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+                  <div class="up-main">Click or drag file to upload</div>
+                  <div style="font-size:12px;color:var(--text-gray);">PDF, PNG, JPG — up to 10 MB</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Month</label>
+              <select id="slip-month">
+                <option value="1">January</option><option value="2">February</option>
+                <option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Year</label>
+              <input type="number" id="slip-year" placeholder="e.g. 2026" value="2026" min="2020" max="2099">
+            </div>
+            <div class="form-group full" id="upload-status"></div>
+            <div class="form-group full">
+              <button class="btn btn-primary" style="width:max-content;" onclick="uploadSlip()">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload to S3
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function showSection(name, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const t = document.getElementById('sec-' + name);
+      if (t) t.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.querySelector('.main').scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    async function uploadSlip() {
+      const fileInput = document.getElementById('slip-file');
+      const month     = document.getElementById('slip-month').value;
+      const year      = document.getElementById('slip-year').value;
+      const statusEl  = document.getElementById('upload-status');
+      if (!fileInput.files[0]) { statusEl.innerHTML = '<p style="color:#ee5d50;font-size:13px;font-weight:600;">Please select a file first.</p>'; return; }
+      const fd = new FormData();
+      fd.append('file',  fileInput.files[0]);
+      fd.append('month', month);
+      fd.append('year',  year);
+      statusEl.innerHTML = '<p style="color:var(--text-gray);font-size:13px;font-weight:500;"><i class="fa-solid fa-spinner fa-spin"></i> Uploading…</p>';
+      try {
+        const res  = await fetch('/api/employee/salary-slip/upload', { method:'POST', body:fd });
+        const data = await res.json();
+        if (data.success) {
+          statusEl.innerHTML = `<p style="color:#02a479;font-size:13px;font-weight:600;"><i class="fa-solid fa-check-circle"></i> Uploaded! Slip ID: ${data.slip_id}</p>`;
+          fileInput.value = '';
+        } else {
+          statusEl.innerHTML = `<p style="color:#ee5d50;font-size:13px;font-weight:600;">Error: ${data.message}</p>`;
+        }
+      } catch(e) {
+        statusEl.innerHTML = '<p style="color:#ee5d50;font-size:13px;font-weight:600;">Network error. Please try again.</p>';
+      }
+    }
+
+    async function downloadSlip(slipId) {
+      if (!slipId || slipId === 'None') return alert('Slip not available.');
+      try {
+        const res  = await fetch(`/api/employee/salary-slip/download/${slipId}`);
+        const data = await res.json();
+        if (data.success && data.url) {
+          window.open(data.url, '_blank');
+        } else {
+          alert('Could not generate download link: ' + (data.message || 'Unknown error'));
+        }
+      } catch(e) { alert('Network error.'); }
+    }
+
+    if (window !== window.top) document.body.classList.add('embedded');
+  </script>
+</body>
+</html>

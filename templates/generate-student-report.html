@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Student Report</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #e1f5fe, #ede7f6);
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 30px;
+      background: linear-gradient(to right, #42a5f5, #7e57c2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo img { height: 45px; }
+    .center-text { font-size: 22px; font-weight: 700; color: white; }
+    .profile-wrapper { position: relative; cursor: pointer; }
+    .profile-pic { width: 42px; height: 42px; border-radius: 50%; border: 2px solid white; }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0; top: 55px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      min-width: 160px;
+      z-index: 1000;
+    }
+    .dropdown-menu a {
+      display: block; padding: 10px 14px;
+      text-decoration: none; color: #333; font-weight: 500;
+    }
+    .dropdown-menu a:hover { background: #f1f1f1; }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 95%;
+      margin: 20px auto 10px auto;
+      padding: 10px 16px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      font-size: 14px; color: #555;
+    }
+    .stats-bar strong { color: #3949ab; font-size: 16px; }
+
+    .search-box {
+      padding: 7px 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 240px;
+      outline: none;
+    }
+    .search-box:focus { border-color: #3949ab; }
+
+    /* TABLE CONTAINER — scroll */
+    .table-container {
+      width: 95%;
+      margin: 0 auto 30px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    /* ✅ SCROLLABLE TABLE BODY */
+    .table-scroll {
+      overflow-y: auto;
+      max-height: 60vh;
+      scrollbar-width: thin;
+      scrollbar-color: #3949ab #f0f0f0;
+    }
+    .table-scroll::-webkit-scrollbar { width: 7px; }
+    .table-scroll::-webkit-scrollbar-track { background: #f0f0f0; }
+    .table-scroll::-webkit-scrollbar-thumb { background: #3949ab; border-radius: 4px; }
+
+    table { width: 100%; border-collapse: collapse; min-width: 950px; }
+
+    /* ✅ STICKY HEADER stays fixed when scrolling */
+    thead th {
+      background: #3949ab;
+      color: white;
+      padding: 13px 10px;
+      text-align: center;
+      font-size: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    td {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 11px 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    tr:nth-child(even) { background: #f8f9fa; }
+    tr:hover { background: #e3f2fd; }
+
+    /* BUTTONS */
+    .btn-report {
+      background: #1e88e5; color: white;
+      border: none; padding: 6px 12px;
+      border-radius: 6px; cursor: pointer;
+      font-weight: 600; margin: 2px;
+    }
+    .btn-report:hover { background: #1565c0; }
+
+    .btn-cert {
+      background: #43a047; color: white;
+      border: none; padding: 6px 12px;
+      border-radius: 6px; cursor: pointer;
+      font-weight: 600; margin: 2px;
+    }
+    .btn-cert:hover { background: #2e7d32; }
+
+    .btn-del {
+      background: #e53935; color: white;
+      border: none; padding: 6px 12px;
+      border-radius: 6px; cursor: pointer;
+      font-weight: 600; margin: 2px;
+    }
+    .btn-del:hover { background: #c62828; }
+
+    /* BACK */
+    .back-resources { text-align: center; margin: 10px 0 40px; }
+    .back-btn {
+      background: #3949ab; color: white;
+      padding: 10px 26px; border-radius: 8px;
+      font-weight: 600; text-decoration: none; display: inline-block;
+    }
+    .back-btn:hover { background: #303f9f; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.55);
+      z-index: 9999; justify-content: center; align-items: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: white; border-radius: 12px;
+      padding: 32px; max-width: 420px; width: 90%;
+      text-align: center; box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 { margin-bottom: 12px; color: #e53935; font-size: 20px; }
+    .modal-box p  { margin-bottom: 24px; color: #555; line-height: 1.6; }
+    .modal-student-name { font-weight: 700; color: #3949ab; }
+    .modal-actions { display: flex; justify-content: center; gap: 16px; }
+    .modal-confirm {
+      background: #e53935; color: white; border: none;
+      padding: 9px 28px; border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .modal-confirm:hover { background: #c62828; }
+    .modal-cancel {
+      background: #9e9e9e; color: white; border: none;
+      padding: 9px 28px; border-radius: 6px; font-weight: 600; cursor: pointer;
+    }
+    .modal-cancel:hover { background: #757575; }
+
+    /* TOAST */
+    .toast {
+      display: none; position: fixed;
+      bottom: 30px; right: 30px;
+      padding: 14px 24px; border-radius: 8px;
+      font-weight: 600; font-size: 14px; color: white;
+      z-index: 99999; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      min-width: 260px; text-align: center;
+    }
+    .toast.success { background: #43a047; }
+    .toast.error   { background: #e53935; }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo"><a href="/"><img src="/static/logo.png" alt="Logo"></a></div>
+    <div class="center-text">Generate Student Report</div>
+    <div class="profile-wrapper" onclick="toggleDropdown()">
+      <img class="profile-pic" src="/static/default.jpg" alt="Profile">
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/profile">Profile</a>
+        <a href="/settings">Settings</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS + SEARCH -->
+  <div class="stats-bar">
+    <div>Total Students: <strong id="totalCount">Loading...</strong></div>
+    <input class="search-box" type="text" id="searchInput"
+      placeholder="🔍 Search name, email, reg ID..." oninput="filterTable()" />
+  </div>
+
+  <!-- TABLE with scroll -->
+  <div class="table-container">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Sl.No</th>
+            <th>First Name</th>
+            <th>Registration ID</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTableBody">
+          <tr><td colspan="7" style="padding:30px;color:#888;">Loading students...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BACK -->
+  <div class="back-resources">
+    <a href="/resources" class="back-btn">← Back to Resources</a>
+  </div>
+
+  <!-- DELETE MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <h3>⚠️ Delete Student</h3>
+      <p>
+        Are you sure you want to delete<br>
+        <span class="modal-student-name" id="modalStudentName"></span>?<br><br>
+        This will permanently remove all their data including
+        registrations, login, billing, enquiries and meeting records.<br>
+        <strong>This cannot be undone.</strong>
+      </p>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm" id="confirmBtn" onclick="confirmDelete()">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let allStudents     = [];
+    let pendingDeleteId = null;
+
+    document.addEventListener("DOMContentLoaded", fetchStudents);
+
+    // ── Fetch students ──────────────────────────────────────────
+    async function fetchStudents() {
+      try {
+        const res    = await fetch("/students");
+        const result = await res.json();
+        const tbody  = document.getElementById("studentsTableBody");
+
+        console.log("✅ API response:", result); // ← debug: check in browser console
+
+        if (result.status !== "success" || !result.data || result.data.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='7' style='padding:30px;color:#888;'>No students found.</td></tr>";
+          document.getElementById("totalCount").textContent = "0";
+          return;
+        }
+
+        allStudents = result.data;
+        document.getElementById("totalCount").textContent = allStudents.length;
+        renderTable(allStudents);
+
+      } catch (e) {
+        console.error("Fetch error:", e);
+        document.getElementById("studentsTableBody").innerHTML =
+          "<tr><td colspan='7' style='color:red;padding:20px;'>Error loading students.</td></tr>";
+      }
+    }
+
+    // ── Render rows ─────────────────────────────────────────────
+    function renderTable(data) {
+      const tbody = document.getElementById("studentsTableBody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='7' style='padding:20px;color:#888;'>No matching students.</td></tr>";
+        return;
+      }
+
+      data.forEach((s, idx) => {
+        // ✅ handle both lowercase and uppercase keys from API
+        const regId    = s.registration_id || s.REGISTRATION_ID || '';
+        const name     = s.first_name      || s.FIRST_NAME      || 'N/A';
+        const email    = s.email           || s.EMAIL           || 'N/A';
+        const phone    = s.phone           || s.PHONE           || 'N/A';
+        const address  = s.address         || s.ADDRESS         || 'N/A';
+        const safeName = name.replace(/'/g, "\\'");
+
+        const row = `
+          <tr id="row-${regId}">
+            <td>${idx + 1}</td>
+            <td>${name}</td>
+            <td>${regId}</td>
+            <td>${email}</td>
+            <td>${phone}</td>
+            <td>${address}</td>
+            <td>
+              <button class="btn-report"
+                onclick="window.location.href='/student-report-view?reg_id=${regId}'">
+                Report
+              </button>
+              <button class="btn-cert"
+                onclick="window.location.href='/generate-certificate?reg_id=${regId}'">
+                Certificate
+              </button>
+              <button class="btn-del"
+                onclick="deleteStudent('${regId}', '${safeName}')">
+                Delete
+              </button>
+            </td>
+          </tr>`;
+        tbody.insertAdjacentHTML("beforeend", row);
+      });
+    }
+
+    // ── Search ──────────────────────────────────────────────────
+    function filterTable() {
+      const q = document.getElementById("searchInput").value.toLowerCase().trim();
+      if (!q) { renderTable(allStudents); return; }
+      const filtered = allStudents.filter(s => {
+        const regId = s.registration_id || s.REGISTRATION_ID || '';
+        const name  = s.first_name      || s.FIRST_NAME      || '';
+        const email = s.email           || s.EMAIL           || '';
+        const phone = s.phone           || s.PHONE           || '';
+        return name.toLowerCase().includes(q)  ||
+               regId.toLowerCase().includes(q) ||
+               email.toLowerCase().includes(q) ||
+               phone.toLowerCase().includes(q);
+      });
+      renderTable(filtered);
+    }
+
+    // ── Open delete modal ───────────────────────────────────────
+    function deleteStudent(registrationId, studentName) {
+      console.log("🗑️ Delete clicked → ID:", registrationId); // ← debug
+      if (!registrationId) {
+        showToast("❌ Invalid registration ID.", "error");
+        return;
+      }
+      pendingDeleteId = registrationId;
+      document.getElementById("modalStudentName").textContent = studentName;
+      document.getElementById("deleteModal").classList.add("active");
+    }
+
+    // ── Close modal ─────────────────────────────────────────────
+    function closeModal() {
+      pendingDeleteId = null;
+      document.getElementById("deleteModal").classList.remove("active");
+    }
+
+    // ── Confirm delete ──────────────────────────────────────────
+    async function confirmDelete() {
+      if (!pendingDeleteId) return;
+
+      const regId = pendingDeleteId;
+      const btn   = document.getElementById("confirmBtn");
+
+      btn.disabled    = true;
+      btn.textContent = "Deleting...";
+      closeModal();
+
+      console.log("📡 Sending delete for:", regId); // ← debug
+
+      try {
+        const res = await fetch(`/delete_student/${encodeURIComponent(regId)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const result = await res.json();
+        console.log("🔁 Delete response:", result); // ← debug
+
+        if (result.success) {
+          allStudents = allStudents.filter(s =>
+            (s.registration_id || s.REGISTRATION_ID) !== regId
+          );
+          document.getElementById("totalCount").textContent = allStudents.length;
+
+          const row = document.getElementById(`row-${regId}`);
+          if (row) row.remove();
+
+          document.querySelectorAll("#studentsTableBody tr").forEach((tr, i) => {
+            if (tr.cells && tr.cells.length > 1) tr.cells[0].textContent = i + 1;
+          });
+
+          showToast("✅ Student deleted successfully.", "success");
+        } else {
+          showToast("❌ " + (result.message || "Delete failed."), "error");
+        }
+
+      } catch (e) {
+        console.error("Delete error:", e);
+        showToast("❌ Network error. Please try again.", "error");
+      }
+
+      btn.disabled    = false;
+      btn.textContent = "Yes, Delete";
+    }
+
+    // ── Toast ───────────────────────────────────────────────────
+    function showToast(msg, type) {
+      const t = document.getElementById("toast");
+      t.textContent   = msg;
+      t.className     = `toast ${type}`;
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 4000);
+    }
+
+    // ── Dropdown ────────────────────────────────────────────────
+    function toggleDropdown() {
+      const m = document.getElementById("dropdownMenu");
+      m.style.display = m.style.display === "block" ? "none" : "block";
+    }
+
+    document.addEventListener("click", function(e) {
+      const w = document.querySelector(".profile-wrapper");
+      if (w && !w.contains(e.target)) {
+        document.getElementById("dropdownMenu").style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>

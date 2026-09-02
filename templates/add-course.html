@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Course - ChakoraHub</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #ffffff);
+        }
+
+        /* ===== HEADER (Same as admin-dashboard & employee-report) ===== */
+        .top-header {
+            background: linear-gradient(90deg, #3e70d6, #4b8bff);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+
+        .top-header .logo {
+            height: 55px;
+        }
+
+        .top-header .title {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-wrapper {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .profile-pic {
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            color: black;
+            min-width: 160px;
+            border-radius: 6px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            z-index: 999;
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 12px;
+            text-decoration: none;
+            color: black;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dropdown-menu a:hover {
+            background: #f3f3f3;
+        }
+
+        /* ===== ORIGINAL ADD COURSE PAGE DESIGN (Unchanged) ===== */
+        .container {
+            width: 450px;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #3949ab;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            color: white;
+            background: #5e35b1;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #5e35b1;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .flash {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .success { background: #c8e6c9; color: #256029; }
+        .error { background: #ffcdd2; color: #b71c1c; }
+    </style>
+</head>
+
+<body>
+
+<!-- ===== HEADER START ===== -->
+<div class="top-header">
+    <img src="{{ url_for('static', filename='logo.png') }}" class="logo">
+
+    <div class="title">Add New Course</div>
+
+    <div class="profile-wrapper" onclick="toggleDropdown()">
+        <img src="{{ url_for('static', filename=session.get('profile_pic','profile_photo/defaultpicture.jpg')) }}" class="profile-pic">
+        <div class="dropdown-menu" id="dropdownMenu">
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a href="{{ url_for('settings') }}">Settings</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+</div>
+<!-- ===== HEADER END ===== -->
+
+<div class="container">
+
+    <h2>Add New Course</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, msg in messages %}
+            <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('save_course') }}">
+        <label>Course Name</label>
+        <input type="text" name="course_name" required>
+
+        <label>Course Code</label>
+        <input type="text" name="course_code" required>
+
+        <button type="submit">Save Course</button>
+
+        <!-- FIXED BUTTON (NO INVALID <a><button></button></a>) -->
+        <a class="back" href="{{ url_for('resources') }}">⬅ Back to Resources</a>
+    </form>
+</div>
+
+<script>
+/* HEADER DROPDOWN FIX — no missing semicolon errors */
+function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+document.addEventListener("click", function(e) {
+    const wrapper = document.querySelector(".profile-wrapper");
+    if (!wrapper.contains(e.target)) {
+        document.getElementById("dropdownMenu").style.display = "none";
+    }
+});
+</script>
+
+</body>
+</html>

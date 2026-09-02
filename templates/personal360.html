@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Personal 360 — ChakoraHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary:   #fe7d55;
+      --primary-d: #e0623a;
+      --text-dark: #1a1830;
+      --text-mid:  #4a4869;
+      --text-gray: #9ba0b4;
+      --border:    #f0f0f5;
+      --bg:        #ffffff;
+      --radius:    18px;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg); color:var(--text-dark);
+      min-height:100vh; -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── Embedded ──────────────────────────────── */
+    body.embedded { background:transparent !important; }
+    body.embedded .sidebar { background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); }
+    body.embedded .topbar  { display:none !important; }
+    body.embedded .layout  { min-height:100vh; }
+
+    /* ── Topbar ─────────────────────────────────── */
+    .topbar {
+      position:sticky; top:0; z-index:20;
+      background:#fff; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-badge {
+      width:42px; height:42px; border-radius:12px;
+      background:linear-gradient(135deg,#fe7d55,#e0623a);
+      display:grid; place-items:center; color:#fff; font-size:17px;
+    }
+    .brand-text strong { display:block; font-family:'Space Grotesk',sans-serif; font-size:17px; color:var(--text-dark); letter-spacing:-0.2px; }
+    .brand-text span   { color:var(--text-gray); font-size:12px; font-weight:500; }
+    .profile-area { display:flex; align-items:center; gap:12px; }
+    .avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:#1a1830; display:grid; place-items:center;
+      color:#fff; font-weight:700; font-size:15px;
+      border:2px solid var(--border); transition:border-color .2s;
+    }
+    .avatar:hover { border-color:var(--primary); }
+    .profile-info { text-align:right; }
+    .profile-info strong { display:block; font-size:13px; color:var(--text-dark); }
+    .profile-info span   { font-size:12px; color:var(--text-gray); }
+
+    /* ── Layout ─────────────────────────────────── */
+    .layout { display:flex; min-height:calc(100vh - 73px); }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    .sidebar {
+      width:234px; flex-shrink:0;
+      background:var(--bg); border-right:1px solid var(--border);
+      padding:28px 18px; display:flex; flex-direction:column; gap:2px;
+      position:sticky; top:73px; height:calc(100vh - 73px); overflow-y:auto;
+    }
+    .sl {
+      font-size:10px; font-weight:700; letter-spacing:0.8px;
+      text-transform:uppercase; color:var(--text-gray);
+      padding:14px 10px 6px; margin-top:4px;
+    }
+    .nav-item {
+      display:flex; align-items:center; gap:11px;
+      padding:10px 14px; border-radius:12px;
+      color:var(--text-gray); cursor:pointer;
+      font-size:13px; font-weight:600;
+      border:none; background:none; width:100%; text-align:left;
+      transition:all .2s ease; position:relative;
+    }
+    .nav-item .ni { width:22px; font-size:14px; text-align:center; flex-shrink:0; transition:color .2s; }
+    .nav-item:hover { color:var(--text-dark); background:rgba(254,125,85,0.07); }
+    .nav-item:hover .ni { color:var(--primary); }
+    .nav-item.active { background:rgba(254,125,85,0.1); color:var(--primary-d); font-weight:700; }
+    .nav-item.active .ni { color:var(--primary); }
+    .nav-item.active::before {
+      content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+      width:3px; height:55%; background:var(--primary); border-radius:0 3px 3px 0;
+    }
+
+    /* ── Main ────────────────────────────────────── */
+    .main { flex:1; padding:36px 36px 40px; overflow-y:auto; }
+    .section { display:none; }
+    .section.active { display:block; animation:fadeUp .32s ease both; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Header banner ───────────────────────────── */
+    .hero-banner {
+      border-radius:var(--radius);
+      background:linear-gradient(120deg,#1a0a00 0%,#3d1a0a 55%,#2a1008 100%);
+      padding:32px 36px; color:#fff; position:relative; overflow:hidden;
+      margin-bottom:28px;
+    }
+    .hero-banner::before {
+      content:''; position:absolute; right:-80px; top:-80px;
+      width:300px; height:300px;
+      background:radial-gradient(circle,rgba(254,125,85,0.18) 0%,transparent 65%);
+      border-radius:50%;
+    }
+    .hero-inner { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .hero-text h2 { font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:700; margin-bottom:8px; letter-spacing:-0.4px; }
+    .hero-text p  { font-size:13px; color:rgba(255,255,255,0.6); font-weight:500; line-height:1.6; }
+    .hero-icon {
+      width:72px; height:72px; border-radius:50%;
+      background:rgba(254,125,85,0.15); border:1px solid rgba(254,125,85,0.3);
+      display:grid; place-items:center;
+    }
+    .hero-icon i { font-size:28px; color:var(--primary); }
+
+    /* ── Stats grid ──────────────────────────────── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:20px;
+      transition:transform .22s ease, box-shadow .22s ease;
+      position:relative; overflow:hidden;
+    }
+    .stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.07); }
+    .stat-icon { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; font-size:16px; color:#fff; margin-bottom:14px; }
+    .stat-value { font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:var(--text-dark); margin-bottom:4px; letter-spacing:-0.5px; }
+    .stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-gray); }
+
+    /* ── Info grid (profile cards) ───────────────── */
+    .info-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .info-card {
+      background:#fff; border-radius:14px;
+      border:1px solid var(--border); padding:22px;
+      position:relative; overflow:hidden;
+      transition:transform .22s ease, box-shadow .22s ease;
+    }
+    .info-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.07); }
+    .ic-bg-icon { position:absolute; top:18px; right:18px; font-size:26px; color:rgba(155,160,180,0.12); }
+    .info-card h3 {
+      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;
+      color:var(--text-gray); margin-bottom:8px;
+      display:flex; align-items:center; gap:7px;
+    }
+    .info-card h3 i { font-size:12px; color:var(--primary); }
+    .info-card p { font-size:15px; font-weight:700; color:var(--text-dark); line-height:1.4; }
+
+    /* ── Content panels ──────────────────────────── */
+    .panel {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:24px;
+      margin-bottom:24px;
+      box-shadow:0 2px 12px rgba(0,0,0,0.03);
+    }
+    .panel-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);
+    }
+    .panel-title { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:var(--text-dark); display:flex; align-items:center; gap:9px; }
+    .panel-title i { font-size:13px; color:var(--text-gray); }
+    .section-header { margin-bottom:28px; }
+    .page-title    { font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700; color:var(--text-dark); letter-spacing:-0.3px; margin-bottom:4px; }
+    .page-subtitle { font-size:13px; color:var(--text-gray); font-weight:500; }
+
+    /* ── Tables ──────────────────────────────────── */
+    table { width:100%; border-collapse:collapse; }
+    thead th {
+      text-align:left; padding:11px 14px;
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+      color:var(--text-gray); border-bottom:2px solid var(--border);
+    }
+    tbody td {
+      padding:14px; font-size:13px; font-weight:500;
+      color:var(--text-dark); border-bottom:1px solid var(--border);
+    }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover td { background:rgba(254,125,85,0.03); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    /* ── Badges / pills ──────────────────────────── */
+    .badge {
+      display:inline-flex; align-items:center;
+      padding:5px 11px; border-radius:20px;
+      font-size:11px; font-weight:700;
+    }
+    .b-green  { background:rgba(5,205,153,0.12); color:#02a479; }
+    .b-amber  { background:rgba(254,125,85,0.14); color:var(--primary); }
+    .b-purple { background:rgba(106,52,123,0.1);  color:#6a347b; }
+    .b-gray   { background:#f0f0f5; color:var(--text-gray); }
+    .b-red    { background:rgba(238,93,80,0.1);   color:#ee5d50; }
+
+    /* ── Forms ───────────────────────────────────── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .form-group { display:flex; flex-direction:column; gap:7px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:11px; font-weight:700; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px; }
+    input,select,textarea {
+      width:100%; padding:10px 14px;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+      color:var(--text-dark); background:#fff; outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus,select:focus,textarea:focus {
+      border-color:var(--primary);
+      box-shadow:0 0 0 3px rgba(254,125,85,0.12);
+    }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:10px 20px; border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+      cursor:pointer; border:none; transition:all .2s ease;
+    }
+    .btn-primary { background:var(--primary); color:#fff; }
+    .btn-primary:hover { background:var(--primary-d); transform:translateY(-1px); box-shadow:0 4px 12px rgba(254,125,85,0.3); }
+    .btn-outline { background:transparent; color:var(--text-mid); border:1.5px solid var(--border); }
+    .btn-outline:hover { background:#fafafa; border-color:#d0d0dc; }
+
+    /* ── Status indicator ────────────────────────── */
+    .status-dot {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:13px; font-weight:600;
+    }
+    .status-dot::before {
+      content:''; width:8px; height:8px; border-radius:50%;
+      background:var(--dot-color,#9ba0b4);
+    }
+    .status-active  { --dot-color:#05cd99; color:#02a479; }
+    .status-inactive{ --dot-color:#ee5d50; color:#ee5d50; }
+
+    /* ── Scrollbar ───────────────────────────────── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#e0e0e8; border-radius:4px; }
+
+    @media(max-width:900px) {
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
+      .info-grid  { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  {% set p_emp      = personal.employee  if personal is defined and personal.employee  is defined else {} %}
+  {% set p_profile  = personal.profile   if personal is defined and personal.profile   is defined else {} %}
+  {% set p_job      = personal.job       if personal is defined and personal.job       is defined else {} %}
+  {% set p_leaves   = personal.leaves    if personal is defined and personal.leaves    is defined else [] %}
+  {% set p_assets   = personal.assets    if personal is defined and personal.assets    is defined else [] %}
+  {% set p_appraisal= personal.appraisal if personal is defined and personal.appraisal is defined else [] %}
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-id-card"></i></div>
+      <div class="brand-text">
+        <strong>Personal 360</strong>
+        <span>Employee profile &amp; history</span>
+      </div>
+    </div>
+    <div class="profile-area">
+      <div class="profile-info">
+        <strong>{{ employee_name or 'Employee' }}</strong>
+        <span>ID: {{ employee_id or 'N/A' }}</span>
+      </div>
+      <div class="avatar">{{ (employee_name or 'E')[0] }}</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sl">Modules</div>
+      <button class="nav-item active" onclick="showSection('overview',this)">
+        <span class="ni"><i class="fa-solid fa-house"></i></span> Overview
+      </button>
+      <button class="nav-item" onclick="showSection('personal',this)">
+        <span class="ni"><i class="fa-solid fa-id-card"></i></span> Personal Info
+      </button>
+      <button class="nav-item" onclick="showSection('assets',this)">
+        <span class="ni"><i class="fa-solid fa-laptop"></i></span> Assets
+      </button>
+      <button class="nav-item" onclick="showSection('appraisal',this)">
+        <span class="ni"><i class="fa-solid fa-star"></i></span> Appraisal
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- ══ OVERVIEW ══════════════════════════════ -->
+      <div class="section active" id="sec-overview">
+
+        <div class="hero-banner">
+          <div class="hero-inner">
+            <div class="hero-text">
+              <h2>{{ employee_name or 'Employee' }}</h2>
+              <p>
+                {{ p_job.get('DESIGNATION') or p_job.get('designation') or 'N/A' }}
+                &nbsp;·&nbsp;
+                {{ p_job.get('DEPT_NAME') or p_job.get('dept_name') or p_job.get('DEPT_ID') or 'N/A' }}
+              </p>
+            </div>
+            <div class="hero-icon"><i class="fa-solid fa-user-tie"></i></div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fe7d55,#e0623a);">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="stat-value" style="font-size:18px;">{{ p_emp.get('STATUS') or p_emp.get('status') or 'Unknown' }}</div>
+            <div class="stat-label">Employment status</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#6a347b,#9b59b6);">
+              <i class="fa-solid fa-building"></i>
+            </div>
+            <div class="stat-value" style="font-size:17px;">{{ p_job.get('DEPT_NAME') or p_job.get('dept_name') or 'N/A' }}</div>
+            <div class="stat-label">Department</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#3bc7c0,#78c0c4);">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-value">{{ p_leaves | length if p_leaves else 0 }}</div>
+            <div class="stat-label">Leave records</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#ee5d50,#f08070);">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="stat-value">{{ p_appraisal | length if p_appraisal else 0 }}</div>
+            <div class="stat-label">Appraisal entries</div>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <i class="fa-solid fa-heart-pulse ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-circle-dot"></i> Status</h3>
+            <p>
+              <span class="status-dot {{ 'status-active' if (p_emp.get('STATUS') or p_emp.get('status')) == 'Active' else 'status-inactive' }}">
+                {{ p_emp.get('STATUS') or p_emp.get('status') or 'Unknown' }}
+              </span>
+            </p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-building ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-building"></i> Department</h3>
+            <p>{{ p_job.get('DEPT_NAME') or p_job.get('dept_name') or p_job.get('DEPT_ID') or 'N/A' }}</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-user-tie ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-user-tie"></i> Designation</h3>
+            <p>{{ p_job.get('DESIGNATION') or p_job.get('designation') or 'N/A' }}</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-phone ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-phone"></i> Contact</h3>
+            <p>{{ p_profile.get('CONTACT') or p_profile.get('contact') or 'Not available' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PERSONAL INFO ═════════════════════════ -->
+      <div class="section" id="sec-personal">
+        <div class="section-header">
+          <div class="page-title">Personal Information</div>
+        </div>
+
+        <!-- Key Details Cards -->
+        <div class="info-grid">
+          <div class="info-card">
+            <i class="fa-solid fa-signature ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-signature"></i> Full Name</h3>
+            <p>{{ p_emp.get('EMPLOYEE_NAME') or p_emp.get('employee_name') or employee_name or 'N/A' }}</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-location-dot ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-location-dot"></i> Location</h3>
+            <p>{{ p_job.get('LOCATION_ID') or p_job.get('location_id') or p_profile.get('LOCATION') or p_profile.get('location') or 'N/A' }}</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-envelope ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-envelope"></i> Email</h3>
+            <p>{{ p_emp.get('EMAIL') or p_emp.get('email') or 'Not available' }}</p>
+          </div>
+          <div class="info-card">
+            <i class="fa-solid fa-phone ic-bg-icon"></i>
+            <h3><i class="fa-solid fa-phone"></i> Contact Number</h3>
+            <p>{{ p_profile.get('CONTACT') or p_profile.get('contact') or 'Not available' }}</p>
+          </div>
+        </div>
+
+        <!-- Update Form -->
+        <div class="panel" style="margin-top:24px;">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-pen-to-square"></i> Update Personal Details</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Contact Number</label>
+              <input type="text" id="upd-contact" placeholder="e.g. +91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="upd-location" placeholder="e.g. Bangalore, Delhi">
+            </div>
+            <div class="form-group full">
+              <label>Address</label>
+              <input type="text" id="upd-address" placeholder="Street, City, State, PIN">
+            </div>
+            <div class="form-group full">
+              <label>Bank Details</label>
+              <input type="text" id="upd-bank" placeholder="Bank Name · A/C XXXX · IFSC">
+            </div>
+            <div class="form-group full">
+              <button class="btn btn-primary" style="width:max-content;" onclick="updateProfile()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+              </button>
+              <div id="upd-status-msg" style="margin-top:10px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ASSETS ══════════════════════════════ -->
+      <div class="section" id="sec-assets">
+        <div class="section-header">
+          <div class="page-title">Assets</div>
+          <div class="page-subtitle">Asset allocation from EMP_NRM_ASSETS.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-laptop"></i> Assigned Assets</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-gray);">
+              {{ p_assets | length if p_assets else 0 }} items
+            </span>
+          </div>
+          {% if p_assets %}
+          <table>
+            <thead>
+              <tr><th>Asset Type</th><th>Assigned</th><th>Return Date</th><th style="text-align:right;">Status</th></tr>
+            </thead>
+            <tbody>
+              {% for asset in p_assets %}
+              <tr>
+                <td style="font-weight:600;">{{ asset.ASSET_TYPE or asset.asset_type }}</td>
+                <td>{{ asset.ASSIGNED_DATE or asset.assigned_date or 'N/A' }}</td>
+                <td>{{ asset.RETURN_DATE  or asset.return_date  or 'N/A' }}</td>
+                <td style="text-align:right;">
+                  {% set ast = asset.STATUS or asset.status or 'N/A' %}
+                  <span class="badge {{ 'b-green' if ast == 'Active' else 'b-gray' }}">{{ ast }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div style="padding:30px 0; text-align:center; color:var(--text-gray);">
+            <i class="fa-solid fa-laptop" style="font-size:28px; margin-bottom:10px; opacity:0.4;"></i>
+            <p style="font-size:13px; font-weight:500;">No assigned assets found.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ══ APPRAISAL ══════════════════════════════ -->
+      <div class="section" id="sec-appraisal">
+        <div class="section-header">
+          <div class="page-title">Appraisal Summary</div>
+          <div class="page-subtitle">Latest entries from EMP_NRM_APPRAISAL_SUMMARY.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-star"></i> Performance Records</div>
+          </div>
+          {% if p_appraisal %}
+          <table>
+            <thead><tr><th>Date</th><th>Rating</th><th>Submitted By</th><th>Comments</th></tr></thead>
+            <tbody>
+              {% for entry in p_appraisal %}
+              <tr>
+                <td>{{ entry.APPRAISAL_DATE or entry.appraisal_date or 'N/A' }}</td>
+                <td>
+                  {% set rating = (entry.FINAL_RATING or entry.final_rating or 'N/A') | string %}
+                  <span class="badge {{ 'b-green' if rating|float(default=0) >= 4 else ('b-amber' if rating|float(default=0) >= 3 else 'b-purple') }}">
+                    ★ {{ rating }}
+                  </span>
+                </td>
+                <td>{{ entry.SUBMITTED_BY or entry.submitted_by or '—' }}</td>
+                <td>{{ entry.COMMENTS or entry.comments or 'No comments' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div style="padding:30px 0; text-align:center; color:var(--text-gray);">
+            <i class="fa-solid fa-star" style="font-size:28px; margin-bottom:10px; opacity:0.4;"></i>
+            <p style="font-size:13px; font-weight:500;">No appraisal records available.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function showSection(name, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const t = document.getElementById('sec-' + name);
+      if (t) t.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.querySelector('.main').scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    async function updateProfile() {
+      const contact  = document.getElementById('upd-contact').value.trim();
+      const location = document.getElementById('upd-location').value.trim();
+      const address  = document.getElementById('upd-address').value.trim();
+      const bank     = document.getElementById('upd-bank').value.trim();
+      const statusEl = document.getElementById('upd-status-msg');
+
+      if (!contact && !location && !address && !bank) {
+        statusEl.innerHTML = '<p style="color:#ee5d50;font-size:13px;font-weight:600;">Please fill in at least one field.</p>';
+        return;
+      }
+
+      const body = {};
+      if (contact)  body.contact      = contact;
+      if (location) body.location     = location;
+      if (address)  body.address      = address;
+      if (bank)     body.bank_details = bank;
+
+      statusEl.innerHTML = '<p style="color:var(--text-gray);font-size:13px;"><i class="fa-solid fa-spinner fa-spin"></i> Saving…</p>';
+
+      try {
+        const res  = await fetch('/api/employee/profile/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json();
+        if (data.success) {
+          statusEl.innerHTML = '<p style="color:#02a479;font-size:13px;font-weight:600;"><i class="fa-solid fa-check-circle"></i> Profile updated successfully!</p>';
+          setTimeout(() => window.location.reload(), 1200);
+        } else {
+          statusEl.innerHTML = `<p style="color:#ee5d50;font-size:13px;font-weight:600;">Error: ${data.message || 'Unknown error'}</p>`;
+        }
+      } catch (e) {
+        statusEl.innerHTML = '<p style="color:#ee5d50;font-size:13px;font-weight:600;">Network error. Please try again.</p>';
+      }
+    }
+
+    if (window !== window.top) document.body.classList.add('embedded');
+  </script>
+</body>
+</html>

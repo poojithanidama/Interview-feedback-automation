@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin Registration</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent1: #42a5f5;
+      --accent2: #5e35b1;
+      --danger: #e53935;
+      --success: #28a745;
+      --warning: #ffca28;
+      --muted: #6b7280;
+      --card-bg: rgba(255,255,255,0.92);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(120deg,#e6f0fb 0%, #f6f2fb 100%);
+      color:#222;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* Header */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 26px;
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(18,18,18,0.12);
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+    .logo img{ height:66px; display:block; }
+
+    /* Profile */
+    .profile-wrapper{ position:relative; cursor:pointer; display:flex; align-items:center; gap:12px; }
+    .profile-pic{ width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid #fff; }
+    .profile-name{ font-weight:600; color:#fff; }
+
+    .dropdown-menu{
+      display:none;
+      position:absolute;
+      right:0;
+      top:62px;
+      min-width:170px;
+      background:#fff;
+      border-radius:10px;
+      box-shadow: 0 8px 20px rgba(1,1,1,0.12);
+      overflow:hidden;
+      z-index:2000;
+    }
+    .dropdown-menu a{
+      display:block;
+      padding:10px 14px;
+      color:#333;
+      text-decoration:none;
+      font-weight:500;
+      border-bottom:1px solid #f1f1f1;
+    }
+    .dropdown-menu a:last-child{ border-bottom:none; }
+    .dropdown-menu a:hover{ background:#fafafa; }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      max-width: 1200px;
+      margin: 44px auto;
+      gap: 24px;
+      padding: 0 20px;
+    }
+
+    /* Left Panel */
+    .left-panel {
+      width: 250px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 12px 28px rgba(15,15,15,0.08);
+      backdrop-filter: blur(4px);
+      height: fit-content;
+    }
+
+    .registration-type {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .type-btn {
+      padding: 16px 20px;
+      border: none;
+      background: #f8f9fa;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      color: #555;
+      border-left: 4px solid transparent;
+    }
+
+    .type-btn:hover {
+      background: #edf2f7;
+      transform: translateX(4px);
+    }
+
+    .type-btn.active {
+      background: linear-gradient(90deg, rgba(66,165,245,0.1), rgba(94,53,177,0.1));
+      color: var(--accent2);
+      border-left: 4px solid var(--accent2);
+      box-shadow: 0 4px 12px rgba(94,53,177,0.1);
+    }
+
+    /* Right Panel */
+    .right-panel {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 34px 42px;
+      box-shadow: 0 18px 38px rgba(15,15,15,0.09);
+      backdrop-filter: blur(4px);
+    }
+
+    h1{ text-align:center; color:#41207a; margin:0 0 24px; font-size:26px; font-weight:600; }
+    h3{ margin-top:24px; color:#41207a; border-bottom:2px solid #eee; padding-bottom:8px; }
+    h4{ margin-top:0; color:#41207a; border-bottom:1px solid #dee2e6; padding-bottom:8px; }
+
+    /* Flash */
+    .flash{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:10px;
+      font-weight:600;
+      margin-bottom:18px;
+      font-size:15px;
+      animation: pop .28s ease;
+    }
+    .flash.success{ background:#e6f6ea; color:var(--success); border-left:6px solid var(--success); }
+    .flash.warning{ background:#fff9e6; color:var(--warning); border-left:6px solid var(--warning); }
+    .flash.danger, .flash.error{ background:#fbeaea; color:var(--danger); border-left:6px solid var(--danger); }
+    @keyframes pop{ from{opacity:0; transform:translateY(-6px) scale(.99)} to{opacity:1; transform:none} }
+
+    /* Login Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9998;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .login-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+      position: relative;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-modal h2 {
+      margin: 0 0 24px 0;
+      color: #2d3748;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .login-modal .input-group {
+      margin-bottom: 20px;
+    }
+
+    .login-modal .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2b2b2b;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .login-modal .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      font-size: 15px;
+      transition: box-shadow .18s, border-color .18s;
+      font-family: inherit;
+    }
+
+    .login-modal .input-group input:focus {
+      outline: none;
+      border-color: var(--accent2);
+      box-shadow: 0 6px 18px rgba(94,53,177,0.08);
+    }
+
+    .login-modal .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .login-modal .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(94,53,177,0.3);
+    }
+
+    .login-modal .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-modal .error-msg {
+      color: var(--danger);
+      font-weight: 600;
+      font-size: 13px;
+      margin-top: 12px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .login-modal .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background 0.2s ease;
+    }
+
+    .login-modal .close-btn:hover {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    /* Form */
+    form{ margin-top:6px; }
+    .row{ display:flex; gap:18px; }
+    .col{ flex:1; }
+
+    label{ display:block; margin-top:14px; color:#2b2b2b; font-weight:600; font-size:14px; }
+    .required::after{ content:" *"; color:var(--danger); margin-left:3px; font-weight:700; }
+
+    input[type="text"], input[type="email"], input[type="date"], input[type="password"], 
+    input[type="number"], select, textarea{
+      width:100%;
+      padding:12px 14px;
+      margin-top:8px;
+      border-radius:10px;
+      border:1px solid #d1d5db;
+      background:#fff;
+      font-size:15px;
+      transition: box-shadow .18s, border-color .18s;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus{
+      outline:none;
+      border-color:var(--accent2);
+      box-shadow: 0 6px 18px rgba(94,53,177,0.08);
+    }
+
+    textarea{ min-height:80px; resize:vertical; }
+
+    .error-msg{ color:var(--danger); font-weight:600; font-size:13px; margin-top:8px; min-height:18px; }
+    .ok-msg{ color:var(--success); font-weight:600; font-size:13px; margin-top:8px; min-height:18px; }
+
+    /* Employee ID Preview */
+    .emp-id-preview {
+      background: #f0f4f8;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-family: monospace;
+      font-size: 16px;
+      border: 1px dashed #ccc;
+    }
+
+    /* Employer Section */
+    .employer-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 10px 0;
+      border: 1px solid #e9ecef;
+    }
+
+    /* Form Sections */
+    .form-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .form-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Buttons */
+    .button-row{ display:flex; gap:18px; margin-top:22px; }
+    button{
+      flex:1;
+      padding:12px 14px;
+      font-size:15px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+    }
+    .submit-btn{
+      background: linear-gradient(90deg,var(--accent1),var(--accent2));
+      color:white;
+      box-shadow: 0 6px 18px rgba(69,39,160,0.12);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .submit-btn:disabled{
+      opacity:.56; cursor:not-allowed; transform:none; box-shadow:none;
+    }
+    .submit-btn:hover:not(:disabled){ transform:translateY(-2px); }
+
+    .cancel-btn{ background:#ef5350; color:white; }
+    .cancel-btn:hover{ transform:translateY(-2px); box-shadow: 0 8px 18px rgba(229,57,53,0.12); }
+
+    .back { margin-top:20px; text-align:center; }
+    .back a{ text-decoration:none; color:#fff; background:#3949ab; padding:10px 18px; border-radius:8px; font-weight:600; }
+
+    .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      .main-container { flex-direction: column; }
+      .left-panel { width: 100%; }
+      .row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+  </div>
+  <div class="profile-wrapper" onclick="toggleDropdown()">
+    <span class="profile-name">{{ session.get('username', 'Admin') }}</span>
+    <img class="profile-pic" src="{{ url_for('static', filename=session.get('profile_pic', 'profile_photo/defaultpicture.jpg')) }}" alt="Profile">
+    <div class="dropdown-menu" id="profileDropdown">
+      <a href="{{ url_for('profile') }}">Profile</a>
+      <a href="{{ url_for('settings') }}">Settings</a>
+      <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" id="loginModal">
+  <div class="login-modal">
+    <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+    <h2>Login Required</h2>
+    <div class="input-group">
+      <label>Email / Phone</label>
+      <input type="text" id="loginUsername" placeholder="Enter your email or phone">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="loginPassword" placeholder="Enter your password">
+    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="login-btn" onclick="handleLogin()">Login</button>
+  </div>
+</div>
+
+<!-- Main Container -->
+<div class="main-container">
+  <!-- Left Panel: Registration Type -->
+  <div class="left-panel">
+    <h4 style="margin-top:0; text-align:center;">Registration Type</h4>
+    <div class="registration-type">
+      <button class="type-btn active" onclick="showSection('student')">
+        👨‍🎓 Student Registration
+      </button>
+      <button class="type-btn" onclick="showSection('employee')">
+        👔 Employee Registration
+      </button>
+    </div>
+  </div>
+
+  <!-- Right Panel: Forms -->
+  <div class="right-panel">
+    
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <!-- Student Registration Form -->
+    <div id="studentSection" class="form-section active">
+      <h1>Student Registration</h1>
+      
+      <form id="studentForm">
+        <h3>Personal Information</h3>
+        
+        <div class="row">
+          <div class="col">
+            <label class="required">First Name</label>
+            <input type="text" id="studentFirstName" required>
+            <div class="error-msg" id="studentFirstNameError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Last Name</label>
+            <input type="text" id="studentLastName" required>
+            <div class="error-msg" id="studentLastNameError"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label class="required">Email</label>
+            <input type="email" id="studentEmail" required>
+            <div class="error-msg" id="studentEmailError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Phone Number</label>
+            <input type="text" id="studentPhone" maxlength="10" required>
+            <div class="error-msg" id="studentPhoneError"></div>
+          </div>
+        </div>
+
+        <label class="required">Location</label>
+        <input type="text" id="studentLocation" required>
+        <div class="error-msg" id="studentLocationError"></div>
+
+        <h3>Course Information</h3>
+
+        <div class="row">
+          <div class="col">
+            <label class="required">Course</label>
+            <select id="studentCourse" required>
+              <option value="">-- Select Course --</option>
+              {% for c in courses %}
+              <option value="{{ c.ID }}">{{ c.COURSE_NAME }} ({{ c.COURSE_CODE }})</option>
+              {% endfor %}
+            </select>
+            <div class="error-msg" id="studentCourseError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Language</label>
+            <select id="studentLanguage" required>
+              <option value="">-- Select Language --</option>
+              {% for l in languages %}
+              <option value="{{ l.ID }}">{{ l.LANGUAGE }}</option>
+              {% endfor %}
+            </select>
+            <div class="error-msg" id="studentLanguageError"></div>
+          </div>
+        </div>
+
+        <label class="required">Start Date</label>
+        <input type="date" id="studentStartDate" required>
+        <div class="error-msg" id="studentStartDateError"></div>
+
+        <div class="button-row">
+          <button type="button" class="cancel-btn" onclick="window.location.href='/resources'">Cancel</button>
+          <button type="submit" class="submit-btn">Register Student</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Employee Registration Form -->
+    <div id="employeeSection" class="form-section">
+      <h1>Employee Registration</h1>
+      
+      <form id="employeeForm">
+        <h3>Personal Information</h3>
+        
+        <div class="row">
+          <div class="col">
+            <label class="required">First Name</label>
+            <input type="text" id="empFirstName" required>
+            <div class="error-msg" id="empFirstNameError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Last Name</label>
+            <input type="text" id="empLastName" required>
+            <div class="error-msg" id="empLastNameError"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label class="required">Email</label>
+            <input type="email" id="empEmail" required>
+            <div class="error-msg" id="empEmailError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Phone Number</label>
+            <input type="text" id="empPhone" maxlength="10" required>
+            <div class="error-msg" id="empPhoneError"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label class="required">Date of Birth</label>
+            <input type="date" id="empDob" required>
+            <div class="error-msg" id="empDobError"></div>
+          </div>
+          <div class="col">
+            <label>Gender</label>
+            <select id="empGender">
+              <option value="">-- Select Gender --</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Address</label>
+        <textarea id="empAddress" rows="3" placeholder="Enter complete address"></textarea>
+
+        <div class="row">
+          <div class="col">
+            <label>Emergency Contact Name</label>
+            <input type="text" id="empEmergencyName">
+          </div>
+          <div class="col">
+            <label>Emergency Contact Phone</label>
+            <input type="text" id="empEmergencyPhone" maxlength="10">
+          </div>
+        </div>
+
+        <h3>Experience Details</h3>
+
+        <label class="required">Experience Level</label>
+        <select id="empExperienceLevel" required>
+          <option value="">-- Select Experience --</option>
+          <option value="Fresher">Fresher</option>
+          <option value="Experienced">Experienced</option>
+        </select>
+        <div class="error-msg" id="empExperienceError"></div>
+
+        <!-- Experience Fields (Hidden by default) -->
+        <div id="experienceFields" style="display: none;">
+          <label>Total Experience (Years)</label>
+          <input type="number" id="empTotalExperience" min="0" max="50" step="0.5">
+
+          <!-- Previous Employer 1 -->
+          <div class="employer-section">
+            <h4>Previous Employer 1</h4>
+            <div class="row">
+              <div class="col">
+                <label>Company Name</label>
+                <input type="text" id="empEmployer1Company">
+              </div>
+              <div class="col">
+                <label>Designation</label>
+                <input type="text" id="empEmployer1Designation">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>From Date</label>
+                <input type="date" id="empEmployer1From">
+              </div>
+              <div class="col">
+                <label>To Date</label>
+                <input type="date" id="empEmployer1To">
+              </div>
+            </div>
+          </div>
+
+          <!-- Previous Employer 2 -->
+          <div class="employer-section">
+            <h4>Previous Employer 2</h4>
+            <div class="row">
+              <div class="col">
+                <label>Company Name</label>
+                <input type="text" id="empEmployer2Company">
+              </div>
+              <div class="col">
+                <label>Designation</label>
+                <input type="text" id="empEmployer2Designation">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>From Date</label>
+                <input type="date" id="empEmployer2From">
+              </div>
+              <div class="col">
+                <label>To Date</label>
+                <input type="date" id="empEmployer2To">
+              </div>
+            </div>
+          </div>
+
+          <label>Skills (comma separated)</label>
+          <input type="text" id="empSkills" placeholder="e.g., Python, SQL, JavaScript">
+        </div>
+
+        <h3>Job Details</h3>
+
+        <label class="required">Personal Location</label>
+        <input type="text" id="empLocation" required>
+        <div class="error-msg" id="empLocationError"></div>
+
+        <label>Employee ID Preview</label>
+        <div id="empIdPreview" class="emp-id-preview">CH26001</div>
+        <div class="hint">Format: CH{Year}{Sequence} &nbsp;|&nbsp; Example: CH26001, CH26002 ...</div>
+
+        <div class="row">
+          <div class="col">
+            <label class="required">Designation</label>
+            <select id="empDesignation" required>
+              <option value="">-- Select Designation --</option>
+              {% for desig in designations %}
+              <option value="{{ desig.DESIGNATION_ID }}">{{ desig.TITLE }}</option>
+              {% endfor %}
+            </select>
+            <div class="error-msg" id="empDesignationError"></div>
+          </div>
+          <div class="col">
+            <label class="required">Department</label>
+            <select id="empDepartment" required>
+              <option value="">-- Select Department --</option>
+              {% for dept in departments %}
+              <option value="{{ dept.DEPT_ID }}">{{ dept.DEPT_NAME }}</option>
+              {% endfor %}
+            </select>
+            <div class="error-msg" id="empDepartmentError"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Manager</label>
+            <select id="empManager">
+              <option value="">-- Select Manager --</option>
+              {% for mgr in managers %}
+              <option value="{{ mgr.MANAGER_ID }}">{{ mgr.MANAGER_NAME }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col">
+            <label>Work Location</label>
+            <select id="empWorkLocation">
+              <option value="">-- Select Location --</option>
+              {% for loc in work_locations %}
+              <option value="{{ loc.LOCATION_ID }}">{{ loc.BRANCH_NAME }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label>Salary Offered</label>
+            <input type="number" id="empSalary" min="0" step="1000">
+          </div>
+          <div class="col">
+            <label>Joining Date</label>
+            <input type="date" id="empJoiningDate">
+          </div>
+        </div>
+
+        <label>Employment Type</label>
+        <select id="empEmploymentType">
+          <option value="">-- Select Type --</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Intern">Intern</option>
+        </select>
+
+        <div class="button-row">
+          <button type="button" class="cancel-btn" onclick="resetForm('employeeForm')">Reset</button>
+          <button type="submit" class="submit-btn">Register Employee</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="back">
+      <a href="{{ url_for('resources') }}">← Back to Resources</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Global variables
+let isEmployeeLoggedIn = false;
+
+// Profile dropdown toggle
+function toggleDropdown() {
+  const dropdown = document.getElementById('profileDropdown');
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const profileWrapper = document.querySelector('.profile-wrapper');
+  const dropdown = document.getElementById('profileDropdown');
+  if (!profileWrapper.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+
+// Show/Hide sections
+function showSection(type) {
+  const studentSection = document.getElementById('studentSection');
+  const employeeSection = document.getElementById('employeeSection');
+  const buttons = document.querySelectorAll('.type-btn');
+  
+  if (type === 'employee' && !isEmployeeLoggedIn) {
+    // Show login modal for employee registration
+    showLoginModal();
+    return;
+  }
+  
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  if (type === 'student') {
+    studentSection.classList.add('active');
+    employeeSection.classList.remove('active');
+    buttons[0].classList.add('active');
+  } else {
+    studentSection.classList.remove('active');
+    employeeSection.classList.add('active');
+    buttons[1].classList.add('active');
+    updateEmployeeIdPreview();
+  }
+}
+
+// Login Modal Functions
+function showLoginModal() {
+  document.getElementById('loginModal').classList.add('active');
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').textContent = '';
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').classList.remove('active');
+}
+
+function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  const errorDiv = document.getElementById('loginError');
+
+  if (!username || !password) {
+    errorDiv.textContent = 'Please enter both email/phone and password';
+    return;
+  }
+
+  const loginBtn = document.querySelector('.login-btn');
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Verifying...';
+
+  fetch('/admin_employee_login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      errorDiv.textContent = '';
+      isEmployeeLoggedIn = true;
+      closeLoginModal();
+      
+      // Switch to employee form
+      const studentSection = document.getElementById('studentSection');
+      const employeeSection = document.getElementById('employeeSection');
+      const buttons = document.querySelectorAll('.type-btn');
+      
+      buttons.forEach(btn => btn.classList.remove('active'));
+      studentSection.classList.remove('active');
+      employeeSection.classList.add('active');
+      buttons[1].classList.add('active');
+      
+      alert('Login successful! You can now register employees.');
+    } else {
+      errorDiv.textContent = data.message || 'Invalid credentials';
+    }
+  })
+  .catch(err => {
+    console.error('Login error:', err);
+    errorDiv.textContent = 'Login failed. Please try again.';
+  })
+  .finally(() => {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Login';
+  });
+}
+
+// Update employee ID preview — Format: CH{YY}{SEQ} e.g. CH26001
+function updateEmployeeIdPreview() {
+  const preview = document.getElementById('empIdPreview');
+  const year = new Date().getFullYear().toString().slice(-2); // e.g. "26"
+  // Exact sequence (001, 002...) is assigned by the server on registration
+  preview.textContent = `CH${year}###`;
+  preview.title = 'Sequence number is assigned automatically on registration';
+}
+
+// Experience level toggle
+document.getElementById('empExperienceLevel').addEventListener('change', function() {
+  const experienceFields = document.getElementById('experienceFields');
+  if (this.value === 'Experienced') {
+    experienceFields.style.display = 'block';
+  } else {
+    experienceFields.style.display = 'none';
+  }
+});
+
+// Reset form
+function resetForm(formId) {
+  document.getElementById(formId).reset();
+  document.querySelectorAll('.error-msg').forEach(el => el.textContent = '');
+  document.querySelectorAll('.ok-msg').forEach(el => el.textContent = '');
+  if (formId === 'employeeForm') {
+    document.getElementById('experienceFields').style.display = 'none';
+    updateEmployeeIdPreview();
+  }
+}
+
+// Validation Functions
+function setError(node, msg) {
+  node.textContent = msg;
+  node.style.display = msg ? 'block' : 'none';
+}
+
+function setOk(node, msg) {
+  if (msg) {
+    node.style.display = 'block';
+    node.textContent = msg;
+  } else {
+    node.style.display = 'none';
+    node.textContent = '';
+  }
+}
+
+function validEmailDomain(v) {
+  const lower = v.toLowerCase().trim();
+  const domainValid = lower.endsWith("@gmail.com") || lower.endsWith("@chakorahub.com");
+  const formatValid = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(lower);
+  return domainValid && formatValid;
+}
+
+// Student Validation
+function validateStudentFirstName() {
+  const v = document.getElementById('studentFirstName').value.trim();
+  const errorDiv = document.getElementById('studentFirstNameError');
+  if (!v) {
+    setError(errorDiv, "First name is required.");
+    return false;
+  } else if (v.length < 2) {
+    setError(errorDiv, "First name must be at least 2 characters.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentLastName() {
+  const v = document.getElementById('studentLastName').value.trim();
+  const errorDiv = document.getElementById('studentLastNameError');
+  if (!v) {
+    setError(errorDiv, "Last name is required.");
+    return false;
+  } else if (v.length < 2) {
+    setError(errorDiv, "Last name must be at least 2 characters.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentEmail() {
+  const v = document.getElementById('studentEmail').value.trim();
+  const errorDiv = document.getElementById('studentEmailError');
+  if (!v) {
+    setError(errorDiv, "Email is required.");
+    return false;
+  } else if (!validEmailDomain(v)) {
+    setError(errorDiv, "Email must end with @gmail.com or @chakorahub.com");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentPhone() {
+  const v = document.getElementById('studentPhone').value.trim();
+  const errorDiv = document.getElementById('studentPhoneError');
+  if (!v) {
+    setError(errorDiv, "Phone number is required.");
+    return false;
+  } else if (!/^\d{10}$/.test(v)) {
+    setError(errorDiv, "Phone number must be exactly 10 digits.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentLocation() {
+  const v = document.getElementById('studentLocation').value.trim();
+  const errorDiv = document.getElementById('studentLocationError');
+  if (!v) {
+    setError(errorDiv, "Location is required.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentCourse() {
+  const v = document.getElementById('studentCourse').value;
+  const errorDiv = document.getElementById('studentCourseError');
+  if (!v) {
+    setError(errorDiv, "Please select a course.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentLanguage() {
+  const v = document.getElementById('studentLanguage').value;
+  const errorDiv = document.getElementById('studentLanguageError');
+  if (!v) {
+    setError(errorDiv, "Please select a language.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateStudentDate() {
+  const v = document.getElementById('studentStartDate').value;
+  const errorDiv = document.getElementById('studentStartDateError');
+  if (!v) {
+    setError(errorDiv, "Start date is required.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+// Employee Validation
+function validateEmpFirstName() {
+  const v = document.getElementById('empFirstName').value.trim();
+  const errorDiv = document.getElementById('empFirstNameError');
+  if (!v) {
+    setError(errorDiv, "First name is required.");
+    return false;
+  } else if (v.length < 2) {
+    setError(errorDiv, "First name must be at least 2 characters.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpLastName() {
+  const v = document.getElementById('empLastName').value.trim();
+  const errorDiv = document.getElementById('empLastNameError');
+  if (!v) {
+    setError(errorDiv, "Last name is required.");
+    return false;
+  } else if (v.length < 2) {
+    setError(errorDiv, "Last name must be at least 2 characters.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpEmail() {
+  const v = document.getElementById('empEmail').value.trim();
+  const errorDiv = document.getElementById('empEmailError');
+  if (!v) {
+    setError(errorDiv, "Email is required.");
+    return false;
+  } else if (!validEmailDomain(v)) {
+    setError(errorDiv, "Email must end with @gmail.com or @chakorahub.com");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpPhone() {
+  const v = document.getElementById('empPhone').value.trim();
+  const errorDiv = document.getElementById('empPhoneError');
+  if (!v) {
+    setError(errorDiv, "Phone number is required.");
+    return false;
+  } else if (!/^\d{10}$/.test(v)) {
+    setError(errorDiv, "Phone number must be exactly 10 digits.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpLocation() {
+  const v = document.getElementById('empLocation').value.trim();
+  const errorDiv = document.getElementById('empLocationError');
+  if (!v) {
+    setError(errorDiv, "Location is required.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpDob() {
+  const v = document.getElementById('empDob').value;
+  const errorDiv = document.getElementById('empDobError');
+  if (!v) {
+    setError(errorDiv, "Date of birth is required.");
+    return false;
+  } else {
+    const dobDate = new Date(v);
+    const today = new Date();
+    if (dobDate >= today) {
+      setError(errorDiv, "Date of birth must be in the past.");
+      return false;
+    } else {
+      setError(errorDiv, "");
+      return true;
+    }
+  }
+}
+
+function validateEmpExperience() {
+  const v = document.getElementById('empExperienceLevel').value;
+  const errorDiv = document.getElementById('empExperienceError');
+  if (!v) {
+    setError(errorDiv, "Experience level is required.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpDesignation() {
+  const v = document.getElementById('empDesignation').value;
+  const errorDiv = document.getElementById('empDesignationError');
+  if (!v) {
+    setError(errorDiv, "Select a designation.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+function validateEmpDepartment() {
+  const v = document.getElementById('empDepartment').value;
+  const errorDiv = document.getElementById('empDepartmentError');
+  if (!v) {
+    setError(errorDiv, "Select a department.");
+    return false;
+  } else {
+    setError(errorDiv, "");
+    return true;
+  }
+}
+
+/* --------------- STUDENT FORM SUBMISSION --------------- */
+document.getElementById('studentForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const isValid = 
+    validateStudentFirstName() &&
+    validateStudentLastName() &&
+    validateStudentEmail() &&
+    validateStudentPhone() &&
+    validateStudentLocation() &&
+    validateStudentCourse() &&
+    validateStudentLanguage() &&
+    validateStudentDate();
+  
+  if (!isValid) {
+    alert('Please fix all validation errors before submitting.');
+    return;
+  }
+  
+  const payload = {
+    registration_type: 'student',
+    first_name: document.getElementById('studentFirstName').value.trim(),
+    last_name: document.getElementById('studentLastName').value.trim(),
+    email: document.getElementById('studentEmail').value.trim().toLowerCase(),
+    phone: document.getElementById('studentPhone').value.trim(),
+    location: document.getElementById('studentLocation').value.trim(),
+    course: document.getElementById('studentCourse').value,
+    language: document.getElementById('studentLanguage').value,
+    start_date: document.getElementById('studentStartDate').value
+  };
+  
+  console.log("Submitting student registration:", payload);
+  
+  const submitBtn = this.querySelector('.submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Registering...';
+  
+  fetch("/admin-register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    console.log("Response from server:", data);
+    alert(data.message);
+    if (data.success) {
+      document.getElementById('studentForm').reset();
+    }
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    alert("An error occurred. Please try again.");
+  })
+  .finally(() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Register Student';
+  });
+});
+
+/* --------------- EMPLOYEE FORM SUBMISSION --------------- */
+document.getElementById('employeeForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  if (!isEmployeeLoggedIn) {
+    alert('Please login first to register employees.');
+    showLoginModal();
+    return;
+  }
+  
+  const isValid = 
+    validateEmpFirstName() &&
+    validateEmpLastName() &&
+    validateEmpEmail() &&
+    validateEmpPhone() &&
+    validateEmpLocation() &&
+    validateEmpDob() &&
+    validateEmpExperience() &&
+    validateEmpDesignation() &&
+    validateEmpDepartment();
+  
+  if (!isValid) {
+    alert('Please fix all validation errors before submitting.');
+    return;
+  }
+  
+  const firstName = document.getElementById('empFirstName').value.trim();
+  const designation = document.getElementById('empDesignation').value;
+  
+  const payload = {
+    registration_type: 'employee',
+    first_name: firstName,
+    last_name: document.getElementById('empLastName').value.trim(),
+    email: document.getElementById('empEmail').value.trim().toLowerCase(),
+    phone: document.getElementById('empPhone').value.trim(),
+    personal_location: document.getElementById('empLocation').value.trim(),
+    dob: document.getElementById('empDob').value,
+    gender: document.getElementById('empGender').value,
+    address: document.getElementById('empAddress').value.trim(),
+    emergency_contact_name: document.getElementById('empEmergencyName').value.trim(),
+    emergency_contact_phone: document.getElementById('empEmergencyPhone').value.trim(),
+    experience_level: document.getElementById('empExperienceLevel').value,
+    total_experience: document.getElementById('empTotalExperience').value,
+    employer1_company: document.getElementById('empEmployer1Company').value.trim(),
+    employer1_designation: document.getElementById('empEmployer1Designation').value.trim(),
+    employer1_from: document.getElementById('empEmployer1From').value,
+    employer1_to: document.getElementById('empEmployer1To').value,
+    employer2_company: document.getElementById('empEmployer2Company').value.trim(),
+    employer2_designation: document.getElementById('empEmployer2Designation').value.trim(),
+    employer2_from: document.getElementById('empEmployer2From').value,
+    employer2_to: document.getElementById('empEmployer2To').value,
+    skills: document.getElementById('empSkills').value.trim(),
+    designation: designation,
+    department: document.getElementById('empDepartment').value,
+    manager: document.getElementById('empManager').value,
+    work_location: document.getElementById('empWorkLocation').value,
+    salary: document.getElementById('empSalary').value,
+    joining_date: document.getElementById('empJoiningDate').value,
+    employment_type: document.getElementById('empEmploymentType').value
+  };
+  
+  console.log("Submitting employee registration:", payload);
+  
+  const submitBtn = this.querySelector('.submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Registering...';
+  
+  fetch("/admin-register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    console.log("Response from server:", data);
+    alert(data.message);
+    if (data.success) {
+      document.getElementById('employeeForm').reset();
+      document.getElementById('experienceFields').style.display = 'none';
+      updateEmployeeIdPreview();
+    }
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    alert("An error occurred. Please try again.");
+  })
+  .finally(() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Register Employee';
+  });
+});
+
+// Add event listeners for real-time validation
+// Student form
+document.getElementById('studentFirstName').addEventListener('input', validateStudentFirstName);
+document.getElementById('studentLastName').addEventListener('input', validateStudentLastName);
+document.getElementById('studentEmail').addEventListener('input', validateStudentEmail);
+document.getElementById('studentPhone').addEventListener('input', validateStudentPhone);
+document.getElementById('studentLocation').addEventListener('input', validateStudentLocation);
+document.getElementById('studentCourse').addEventListener('change', validateStudentCourse);
+document.getElementById('studentLanguage').addEventListener('change', validateStudentLanguage);
+document.getElementById('studentStartDate').addEventListener('change', validateStudentDate);
+
+// Employee form
+document.getElementById('empFirstName').addEventListener('input', function() {
+  validateEmpFirstName();
+});
+document.getElementById('empLastName').addEventListener('input', validateEmpLastName);
+document.getElementById('empEmail').addEventListener('input', validateEmpEmail);
+document.getElementById('empPhone').addEventListener('input', validateEmpPhone);
+document.getElementById('empLocation').addEventListener('input', validateEmpLocation);
+document.getElementById('empDob').addEventListener('change', validateEmpDob);
+document.getElementById('empExperienceLevel').addEventListener('change', validateEmpExperience);
+document.getElementById('empDesignation').addEventListener('change', function() {
+  validateEmpDesignation();
+});
+document.getElementById('empDepartment').addEventListener('change', validateEmpDepartment);
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeLoginModal();
+  }
+});
+</script>
+
+</body>
+</html>
