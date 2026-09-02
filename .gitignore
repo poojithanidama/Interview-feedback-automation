@@ -1,0 +1,6 @@
+
+.env
+__pycache__/
+*.log
+*.pem
+rsa_key.p8
