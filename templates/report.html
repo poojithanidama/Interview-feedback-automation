@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Details</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #e1f5fe, #ede7f6);
+      color: #333;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 30px;
+      background: linear-gradient(to right, #42a5f5, #7e57c2);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+    }
+
+    .logo img {
+      height: 45px;
+    }
+
+    .center-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* PROFILE DROPDOWN */
+    .profile-wrapper {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .profile-pic {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 55px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      min-width: 160px;
+      z-index: 1000;
+    }
+
+    .dropdown-menu a {
+      display: block;
+      padding: 10px 14px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .dropdown-menu a:hover {
+      background: #f1f1f1;
+    }
+
+    /* PAGE TITLE */
+    .page-title {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 26px;
+      font-weight: 700;
+      color: #4527a0;
+    }
+
+    /* CARD */
+    .card {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto 50px auto;
+      background: white;
+      border-radius: 14px;
+      padding: 25px 30px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background: #e3e7f5;
+      color: #3949ab;
+      border-radius: 10px 10px 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .tab:hover {
+      background: #d6dbf0;
+    }
+
+    .tab.active {
+      background: #3949ab;
+      color: white;
+    }
+
+    /* TAB CONTENT */
+    .tab-content {
+      display: none;
+      padding-top: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    p {
+      font-size: 15px;
+      margin: 10px 0;
+    }
+
+    strong {
+      color: #333;
+    }
+
+    /* BACK BUTTON */
+    .back-btn-wrapper {
+      text-align: center;
+      margin-top: 35px;
+    }
+
+    .back-btn {
+      background: #3949ab;
+      color: white;
+      padding: 10px 26px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #303f9f;
+    }
+  </style>
+
+  <script>
+    function openTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      document.getElementById(tabId + '-btn').classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function toggleDropdown() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <a href="/"><img src="/static/logo.png" alt="Logo"></a>
+    </div>
+
+    <div class="center-text">Student Report</div>
+
+    <div class="profile-wrapper" onclick="toggleDropdown()">
+      <img class="profile-pic"
+           src="{{ url_for('static', filename='images/defaultpicture.jpg') }}"
+           alt="Profile">
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/profile">Profile</a>
+        <a href="/settings">Settings</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <h2 class="page-title">Student Details</h2>
+
+  <!-- MAIN CARD -->
+  <div class="card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" id="basic-btn" onclick="openTab('basic')">Basic Info</div>
+      <div class="tab" id="professional-btn" onclick="openTab('professional')">Professional</div>
+      <div class="tab" id="registration-btn" onclick="openTab('registration')">Registration</div>
+    </div>
+
+    <!-- BASIC INFO -->
+    <div class="tab-content active" id="basic">
+      <p><strong>First Name:</strong> {{ student[0] }}</p>
+      <p><strong>Last Name:</strong> {{ student[1] }}</p>
+      <p><strong>Location:</strong> {{ student[2] }}</p>
+    </div>
+
+    <!-- PROFESSIONAL -->
+    <div class="tab-content" id="professional">
+      <p><strong>Employed:</strong> {{ student[3] }}</p>
+      <p><strong>Experience:</strong> {{ student[4] }}</p>
+    </div>
+
+    <!-- REGISTRATION -->
+    <div class="tab-content" id="registration">
+      <p><strong>Registration ID:</strong> {{ student[5] }}</p>
+      <p><strong>Course:</strong> {{ student[6] }}</p>
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="back-btn-wrapper">
+      <a href="{{ url_for('student_report_page') }}" class="back-btn">
+        ← Back to Student Report
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

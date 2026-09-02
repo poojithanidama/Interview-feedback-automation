@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>E-Learn 360 — ChakoraHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary:   #05cd99;
+      --primary-d: #02a479;
+      --accent:    #6534ff;
+      --text-dark: #1a1830;
+      --text-mid:  #4a4869;
+      --text-gray: #9ba0b4;
+      --border:    #f0f0f5;
+      --bg:        #ffffff;
+      --purple:    #6a347b;
+      --teal:      #78c0c4;
+      --amber:     #fe7d55;
+      --rose:      #ee5d50;
+      --radius:    18px;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Embedded mode ─────────────────────────────── */
+    body.embedded { background: transparent !important; }
+    body.embedded .sidebar { background: rgba(255,255,255,0.75); backdrop-filter: blur(12px); }
+    body.embedded .topbar  { display: none !important; }
+    body.embedded .layout  { min-height: 100vh; }
+
+    /* ── Topbar ─────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: #fff; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 28px;
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-badge {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, #05cd99, #02a479);
+      display: grid; place-items: center; color: #fff; font-size: 17px;
+    }
+    .brand-text strong { display: block; font-family: 'Space Grotesk', sans-serif; font-size: 17px; color: var(--text-dark); letter-spacing: -0.2px; }
+    .brand-text span   { color: var(--text-gray); font-size: 12px; font-weight: 500; }
+    .profile-area { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #1a1830; display: grid; place-items: center;
+      color: #fff; font-weight: 700; font-size: 15px;
+      border: 2px solid var(--border); transition: border-color .2s;
+    }
+    .avatar:hover { border-color: var(--primary); }
+    .profile-info { text-align: right; }
+    .profile-info strong { display: block; font-size: 13px; color: var(--text-dark); }
+    .profile-info span   { font-size: 12px; color: var(--text-gray); }
+
+    /* ── Layout ─────────────────────────────────────── */
+    .layout { display: flex; min-height: calc(100vh - 73px); }
+
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      width: 234px; flex-shrink: 0;
+      background: var(--bg); border-right: 1px solid var(--border);
+      padding: 28px 18px; display: flex; flex-direction: column; gap: 2px;
+      position: sticky; top: 73px; height: calc(100vh - 73px); overflow-y: auto;
+    }
+    .sl {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--text-gray);
+      padding: 14px 10px 6px; margin-top: 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 10px 14px; border-radius: 12px;
+      color: var(--text-gray); cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      border: none; background: none; width: 100%; text-align: left;
+      transition: all .2s ease; position: relative;
+    }
+    .nav-item .ni { width: 22px; font-size: 14px; text-align: center; flex-shrink: 0; transition: color .2s; }
+    .nav-item:hover { color: var(--text-dark); background: rgba(5,205,153,0.07); }
+    .nav-item:hover .ni { color: var(--primary); }
+    .nav-item.active {
+      background: rgba(5,205,153,0.1);
+      color: var(--primary-d); font-weight: 700;
+    }
+    .nav-item.active .ni { color: var(--primary); }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 55%; background: var(--primary); border-radius: 0 3px 3px 0;
+    }
+
+    /* ── Main content ────────────────────────────────── */
+    .main { flex: 1; padding: 36px 36px 40px; overflow-y: auto; }
+    .section { display: none; }
+    .section.active { display: block; animation: fadeUp .32s ease both; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Section header ──────────────────────────────── */
+    .page-header { margin-bottom: 28px; }
+    .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 700; color: var(--text-dark); letter-spacing: -0.3px; margin-bottom: 4px; }
+    .page-subtitle { font-size: 13px; color: var(--text-gray); font-weight: 500; }
+
+    /* ── Welcome banner ──────────────────────────────── */
+    .welcome-banner {
+      border-radius: var(--radius); padding: 32px 36px;
+      background: linear-gradient(120deg, #0f2027 0%, #1a3a2a 55%, #0f3320 100%);
+      color: #fff; position: relative; overflow: hidden; margin-bottom: 28px;
+    }
+    .welcome-banner::before {
+      content: ''; position: absolute;
+      right: -80px; top: -80px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(5,205,153,0.15) 0%, transparent 65%);
+      border-radius: 50%;
+    }
+    .wb-content { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .wt h2 { font-family: 'Space Grotesk', sans-serif; font-size: 23px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.4px; }
+    .wt p  { font-size: 13px; color: rgba(255,255,255,0.65); max-width: 380px; font-weight: 500; line-height: 1.6; }
+    .wb-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .wb-btn {
+      padding: 10px 20px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+      transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .wb-primary { background: var(--primary); color: #fff; }
+    .wb-primary:hover { background: var(--primary-d); transform: translateY(-1px); }
+    .wb-ghost  { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); color: #fff; }
+    .wb-ghost:hover { background: rgba(255,255,255,0.18); }
+    .welcome-ring {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(5,205,153,0.15);
+      border: 1px solid rgba(5,205,153,0.3);
+      display: grid; place-items: center;
+    }
+    .welcome-ring i { font-size: 28px; color: var(--primary); }
+
+    /* ── Stat cards ──────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 20px;
+      transition: transform .22s ease, box-shadow .22s ease;
+      position: relative; overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.07); }
+    .stat-card::after {
+      content: ''; position: absolute; right: -20px; top: -20px;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .stat-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; font-size: 16px; color: #fff; margin-bottom: 14px; }
+    .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; letter-spacing: -0.5px; }
+    .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-gray); }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+    }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 9px; }
+    .card-title i { font-size: 13px; color: var(--text-gray); }
+
+    /* ── Progress rows ───────────────────────────────── */
+    .prog-row {
+      margin-bottom: 12px; padding: 14px 18px; background: #fafafa;
+      border-radius: 12px; border: 1px solid var(--border);
+    }
+    .prog-labels { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+    .prog-name  { font-size: 14px; font-weight: 600; color: var(--text-dark); }
+    .prog-pct   { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+    .prog-sub   { font-size: 11px; color: var(--text-gray); font-weight: 500; }
+    .progress-wrap { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; background: var(--primary); transition: width .9s cubic-bezier(.25,.8,.25,1); }
+    .bg-primary { background: var(--primary); }
+    .bg-amber   { background: var(--amber); }
+    .bg-purple  { background: #6a347b; }
+    .bg-rose    { background: var(--rose); }
+
+    /* ── Tables ──────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; padding: 11px 14px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-gray); border-bottom: 2px solid var(--border);
+    }
+    tbody td {
+      padding: 14px; font-size: 13px; font-weight: 500;
+      color: var(--text-dark); border-bottom: 1px solid var(--border);
+    }
+    tbody tr { transition: background .15s ease; }
+    tbody tr:hover td { background: rgba(5,205,153,0.03); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ──────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 5px 11px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+      transition: opacity .15s;
+    }
+    .b-indigo { background: rgba(106,52,123,0.1); color: var(--purple); }
+    .b-green  { background: rgba(5,205,153,0.12); color: var(--primary-d); }
+    .b-amber  { background: rgba(254,125,85,0.14); color: var(--amber); }
+    .b-rose   { background: rgba(238,93,80,0.1);  color: var(--rose); }
+    .b-teal   { background: rgba(120,192,196,0.15); color: #4a8a8e; }
+    .b-gray   { background: #f0f0f5; color: var(--text-gray); }
+
+    /* ── Forms ───────────────────────────────────────── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 7px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 11px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select, textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      color: var(--text-dark); background: #fff; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(5,205,153,0.12);
+    }
+
+    /* ── Upload zone ─────────────────────────────────── */
+    .upload-zone { position: relative; width: 100%; }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; }
+    .upload-face {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; padding: 30px;
+      border: 2px dashed var(--border); border-radius: 12px;
+      background: #fafafa; transition: border-color .2s, background .2s;
+    }
+    .upload-face .up-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: rgba(5,205,153,0.1); display: grid; place-items: center;
+      font-size: 16px; color: var(--primary);
+    }
+    .upload-face .up-main { font-size: 13px; font-weight: 600; color: var(--text-dark); }
+    .upload-zone:hover .upload-face { border-color: var(--primary); background: rgba(5,205,153,0.04); }
+
+    /* ── Buttons ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 10px 20px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+      transition: all .2s ease;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-d); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,205,153,0.3); }
+    .btn-dark    { background: #1a1830; color: #fff; }
+    .btn-dark:hover { opacity: 0.88; }
+    .btn-outline { background: transparent; color: var(--text-mid); border: 1.5px solid var(--border); }
+    .btn-outline:hover { background: #fafafa; border-color: #d0d0dc; }
+
+    /* ── Course cards ────────────────────────────────── */
+    .course-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .course-card {
+      background: #fff; border-radius: var(--radius);
+      border: 1px solid var(--border); overflow: hidden;
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+    .course-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+    .course-thumb { height: 8px; }
+    .ct-purple { background: linear-gradient(90deg, #6a347b, #9b59b6); }
+    .ct-teal   { background: linear-gradient(90deg, #3bc7c0, #78c0c4); }
+    .ct-amber  { background: linear-gradient(90deg, #fe7d55, #f0a070); }
+    .ct-rose   { background: linear-gradient(90deg, #ee5d50, #f08070); }
+    .course-body { padding: 20px; }
+    .course-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .course-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; letter-spacing: -0.2px; }
+    .course-desc  { font-size: 13px; color: var(--text-gray); margin-bottom: 18px; line-height: 1.55; }
+
+    /* ── Skill tags ──────────────────────────────────── */
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-tag {
+      padding: 8px 14px; border-radius: 10px;
+      background: #fafafa; border: 1.5px solid var(--border);
+      font-weight: 600; font-size: 13px; color: var(--text-dark);
+      display: flex; align-items: center; gap: 8px;
+      transition: border-color .2s, background .2s;
+    }
+    .skill-tag:hover { border-color: var(--primary); background: rgba(5,205,153,0.05); }
+    .skill-level {
+      font-size: 10px; padding: 3px 7px; border-radius: 6px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .lvl-beginner     { background: #f0f0f5; color: var(--text-gray); }
+    .lvl-intermediate { background: rgba(254,125,85,0.12); color: var(--amber); }
+    .lvl-advanced     { background: rgba(5,205,153,0.12); color: var(--primary-d); }
+    .lvl-expert       { background: rgba(101,52,255,0.1); color: #6534ff; }
+
+    /* ── Scrollbar ───────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e0e0e8; border-radius: 4px; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .course-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (hidden when embedded in dashboard iframe) -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-graduation-cap"></i></div>
+      <div class="brand-text">
+        <strong>E-Learn 360</strong>
+        <span>Learning & development portal</span>
+      </div>
+    </div>
+    <div class="profile-area">
+      <div>
+        <div class="profile-info">
+          <strong>{{ employee_name or 'Employee' }}</strong>
+          <span>ID: {{ employee_id or 'N/A' }}</span>
+        </div>
+      </div>
+      <div class="avatar">{{ (employee_name or 'E')[0] }}</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ── Sidebar ──────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sl">Main</div>
+      <button class="nav-item active" onclick="showSection('overview',this)">
+        <span class="ni"><i class="fa-solid fa-house"></i></span> Overview
+      </button>
+
+      <div class="sl">Learning</div>
+      <button class="nav-item" onclick="showSection('skills',this)">
+        <span class="ni"><i class="fa-solid fa-brain"></i></span> Skill Set
+      </button>
+      <button class="nav-item" onclick="showSection('certification',this)">
+        <span class="ni"><i class="fa-solid fa-certificate"></i></span> Certifications
+      </button>
+      <button class="nav-item" onclick="showSection('courses',this)">
+        <span class="ni"><i class="fa-solid fa-graduation-cap"></i></span> Courses
+      </button>
+
+      <div class="sl">Programs</div>
+      <button class="nav-item" onclick="showSection('wilp',this)">
+        <span class="ni"><i class="fa-solid fa-building-columns"></i></span> WILP
+      </button>
+      <button class="nav-item" onclick="showSection('rnd',this)">
+        <span class="ni"><i class="fa-solid fa-flask"></i></span> R&amp;D
+      </button>
+      <button class="nav-item" onclick="showSection('workshop',this)">
+        <span class="ni"><i class="fa-solid fa-chalkboard-user"></i></span> Workshops
+      </button>
+    </aside>
+
+    <!-- ── Main ────────────────────────────────────── -->
+    <main class="main">
+
+      <!-- ══ OVERVIEW ══════════════════════════════ -->
+      <div class="section active" id="sec-overview">
+
+        <div class="welcome-banner">
+          <div class="wb-content">
+            <div class="wt">
+              <h2>Welcome back, {{ employee_name | default('Employee') }} 👋</h2>
+              <p>Track your learning journey, certifications, and skill growth — all from one place.</p>
+              <div class="wb-actions">
+                <button class="wb-btn wb-primary" onclick="showSection('courses', document.querySelectorAll('.nav-item')[3])">
+                  <i class="fa-solid fa-play"></i> Continue Learning
+                </button>
+                <button class="wb-btn wb-ghost" onclick="showSection('certification', document.querySelectorAll('.nav-item')[2])">
+                  <i class="fa-solid fa-plus"></i> Add Certification
+                </button>
+              </div>
+            </div>
+            <div class="welcome-ring"><i class="fa-solid fa-graduation-cap"></i></div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#6a347b,#9b59b6);">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div class="stat-value">{{ skills | length if skills else 0 }}</div>
+            <div class="stat-label">Skills tracked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#3bc7c0,#78c0c4);">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+            <div class="stat-value">{{ certs | length if certs else 0 }}</div>
+            <div class="stat-label">Certifications</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#fe7d55,#f0a070);">
+              <i class="fa-solid fa-book-open"></i>
+            </div>
+            <div class="stat-value">{{ active_courses | default(0) }}</div>
+            <div class="stat-label">Active courses</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg,#ee5d50,#f08070);">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="stat-value">{{ learning_progress | default(0) }}%</div>
+            <div class="stat-label">Avg. progress</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-signal"></i> Skill Proficiency</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-gray);">From appraisal data</span>
+          </div>
+          {% if appraisal_skills %}
+            {% for skill in appraisal_skills %}
+            <div class="prog-row">
+              <div class="prog-labels">
+                <span class="prog-name">{{ skill.name }}</span>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span class="prog-sub">{{ skill.level }}</span>
+                  <span class="prog-pct">{{ skill.pct }}%</span>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-fill {{ 'bg-primary' if skill.pct >= 75 else 'bg-amber' if skill.pct >= 50 else 'bg-purple' }}" data-progress="{{ skill.pct }}">
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="prog-row">
+              <div class="prog-labels"><span class="prog-name">Technical Skills Goals</span><span class="prog-pct">75%</span></div>
+              <div class="progress-wrap"><div class="progress-fill" data-progress="75" style="background:#6a347b;"></div></div>
+            </div>
+            <div class="prog-row">
+              <div class="prog-labels"><span class="prog-name">Compliance Training</span><span class="prog-pct">100%</span></div>
+              <div class="progress-wrap"><div class="progress-fill" data-progress="100" style="background:var(--primary);"></div></div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ══ SKILL SET ═════════════════════════════ -->
+      <div class="section" id="sec-skills">
+        <div class="page-header">
+          <div class="page-title">Skill Set</div>
+          <div class="page-subtitle">Track and update your technical and professional skills.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-plus-circle"></i> Add New Skill</div></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Skill Name</label>
+              <input type="text" id="skill-name" placeholder="e.g. Python, Agile, Project Management">
+            </div>
+            <div class="form-group">
+              <label>Proficiency Level</label>
+              <select id="skill-level">
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+                <option>Expert</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <button class="btn btn-primary" style="width:max-content;" onclick="saveSkill()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Skill
+              </button>
+              <div id="skill-status" style="margin-top:8px;font-size:13px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-tags"></i> Verified Skills</div></div>
+          <div class="skill-tags">
+            {% if skills %}
+              {% for skill in skills %}
+              <div class="skill-tag">
+                {{ skill.NAME or skill.name }}
+                <span class="skill-level lvl-{{ (skill.LEVEL or skill.level or 'beginner') | lower }}">
+                  {{ skill.LEVEL or skill.level or 'Beginner' }}
+                </span>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="skill-tag">Python <span class="skill-level lvl-advanced">Advanced</span></div>
+              <div class="skill-tag">Machine Learning <span class="skill-level lvl-intermediate">Intermediate</span></div>
+              <div class="skill-tag">Snowflake <span class="skill-level lvl-intermediate">Intermediate</span></div>
+              <div class="skill-tag">AWS Cloud <span class="skill-level lvl-beginner">Beginner</span></div>
+              <div class="skill-tag">React.js <span class="skill-level lvl-expert">Expert</span></div>
+              <div class="skill-tag">Agile <span class="skill-level lvl-advanced">Advanced</span></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ CERTIFICATIONS ════════════════════════ -->
+      <div class="section" id="sec-certification">
+        <div class="page-header">
+          <div class="page-title">Certifications</div>
+          <div class="page-subtitle">Upload and manage your professional credentials.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-arrow-up-from-bracket"></i> Upload Certificate</div></div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <div class="upload-zone">
+                <input type="file" id="cert-file" accept=".pdf,.jpg,.png">
+                <div class="upload-face">
+                  <div class="up-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+                  <div class="up-main">Click or drag file to upload</div>
+                  <div style="font-size:12px;color:var(--text-gray);">PDF, PNG, JPG — up to 10 MB</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Certificate Name</label>
+              <input type="text" id="cert-name" placeholder="e.g. AWS Certified Solutions Architect">
+            </div>
+            <div class="form-group">
+              <label>Issuing Organization</label>
+              <input type="text" id="cert-org" placeholder="e.g. Amazon Web Services">
+            </div>
+            <div class="form-group full">
+              <button class="btn btn-primary" style="width:max-content;" onclick="uploadCert()">
+                <i class="fa-solid fa-paper-plane"></i> Submit for Verification
+              </button>
+              <div id="cert-status" style="margin-top:8px;font-size:13px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-award"></i> My Certificates</div></div>
+          <table>
+            <thead><tr><th>Certificate Name</th><th>Issuer / Type</th><th>Uploaded</th><th>Status</th><th style="text-align:right;">Action</th></tr></thead>
+            <tbody>
+              {% if certs %}
+                {% for cert in certs %}
+                <tr id="cert-row-{{ loop.index }}">
+                  <td style="font-weight:600;">{{ cert.DOCUMENT_TYPE or cert.document_type or 'Certificate' }}</td>
+                  <td>{{ cert.document_type or '—' }}</td>
+                  <td>{{ cert.UPLOAD_DATE or cert.upload_date or '—' }}</td>
+                  <td><span class="badge b-green">Uploaded</span></td>
+                  <td style="text-align:right;">
+                    <button class="btn btn-outline" style="padding:6px 12px;font-size:12px;color:#ee5d50;border-color:rgba(238,93,80,0.3);"
+                            data-cert-id="{{ cert.ID or cert.id or '' }}"
+                            data-file-path="{{ cert.FILE_PATH or cert.file_path or '' }}"
+                            onclick="deleteCert(this.dataset.certId, this.dataset.filePath, this)">
+                      <i class="fa-solid fa-trash"></i> Delete
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td>AWS Cloud Practitioner</td><td>Amazon Web Services</td><td>Oct 2024</td>
+                  <td><span class="badge b-green">Verified</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 12px;font-size:12px;color:#ee5d50;border-color:rgba(238,93,80,0.3);"><i class="fa-solid fa-trash"></i> Delete</button></td>
+                </tr>
+                <tr>
+                  <td>Data Science Bootcamp</td><td>Coursera</td><td>Feb 2025</td>
+                  <td><span class="badge b-amber">Pending</span></td>
+                  <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 12px;font-size:12px;color:#ee5d50;border-color:rgba(238,93,80,0.3);"><i class="fa-solid fa-trash"></i> Delete</button></td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ COURSES ════════════════════════════════ -->
+      <div class="section" id="sec-courses">
+        <div class="page-header">
+          <div class="page-title">Company Courses</div>
+          <div class="page-subtitle">Browse training videos from the ChakoraHub YouTube channel.</div>
+        </div>
+        <div class="course-grid">
+          {% set color_cycle = ['purple','teal','amber','rose','indigo','green'] %}
+          {% set badge_cycle = ['indigo','teal','amber','rose','purple','green'] %}
+          {% if courses %}
+            {% set video_courses = courses | selectattr('video_count', 'gt', 0) | list %}
+            {% if video_courses %}
+              {% for course in video_courses %}
+              {% set ci = loop.index0 % color_cycle|length %}
+            <div class="course-card">
+              <div class="course-thumb ct-{{ color_cycle[ci] }}"></div>
+              <div class="course-body">
+                <div class="course-meta">
+                  <span class="badge b-{{ badge_cycle[ci] }}">{{ course.subject }}</span>
+                  <span style="font-size:11px;color:var(--text-gray);">{{ course.video_count }} video{{ 's' if course.video_count != 1 else '' }}</span>
+                </div>
+                <div class="course-title">{{ course.subject }}</div>
+                <div class="course-desc">Company-provided YouTube training videos for this subject.</div>
+                <div style="margin-bottom:18px;">
+                  <div class="prog-labels"><span class="prog-name" style="font-size:12px;">Progress</span><span class="prog-pct">{{ course.progress|default(0) }}%</span></div>
+                  <div class="progress-wrap"><div class="progress-fill bg-{{ color_cycle[ci] }}" data-progress="{{ course.progress|default(0) }}"></div></div>
+                </div>
+                {% if course.first_url %}
+                  <a href="{{ course.first_url }}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;text-decoration:none;display:block;">
+                    <i class="fa-brands fa-youtube"></i>
+                    {% if course.progress|default(0)|int >= 100 %}Revisit{% elif course.progress|default(0)|int > 0 %}Continue{% else %}Start Course{% endif %}
+                  </a>
+                {% else %}
+                  <button class="btn btn-primary" style="width:100%;">
+                    {% if course.progress|default(0)|int >= 100 %}Revisit{% elif course.progress|default(0)|int > 0 %}Continue{% else %}Start Course{% endif %}
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+              {% endfor %}
+            {% else %}
+              <div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text-gray);">
+                <i class="fa-solid fa-video" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+                <p style="font-size:14px;">No video courses available yet. Courses with YouTube videos will appear here.</p>
+              </div>
+            {% endif %}
+          {% else %}
+            <div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text-gray);">
+              <i class="fa-solid fa-video" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+              <p style="font-size:14px;">No courses available yet. Videos are loaded from the <strong>COURSE_VIDEOS</strong> table.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+            <!-- ══ WILP ═══════════════════════════════════ -->
+      <div class="section" id="sec-wilp">
+        <div class="page-header">
+          <div class="page-title">WILP — Work Integrated Learning</div>
+          <div class="page-subtitle">Company-sponsored higher education programs will appear here once available.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-university"></i> WILP Programs</div></div>
+          <div style="padding:32px;text-align:center;color:var(--text-gray);">
+            <i class="fa-solid fa-building-columns" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+            <p style="font-size:14px;">No active WILP program found for your profile. Contact HR to enroll.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ R&D ════════════════════════════════════ -->
+      <div class="section" id="sec-rnd">
+        <div class="page-header">
+          <div class="page-title">Research &amp; Development</div>
+          <div class="page-subtitle">Publications, patents, and innovation projects will appear here once available.</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-flask-vial"></i> My R&amp;D Portfolio</div>
+          </div>
+          <div style="padding:32px;text-align:center;color:var(--text-gray);">
+            <i class="fa-solid fa-flask-vial" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+            <p style="font-size:14px;">No R&amp;D records found. Contact your department lead to submit a paper or project.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ WORKSHOPS ══════════════════════════════ -->
+      <div class="section" id="sec-workshop">
+        <div class="page-header">
+          <div class="page-title">Workshops</div>
+          <div class="page-subtitle">Upcoming training sessions and guest lectures will appear here.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fa-solid fa-chalkboard-user"></i> Upcoming Workshops</div></div>
+          <div style="padding:32px;text-align:center;color:var(--text-gray);">
+            <i class="fa-solid fa-chalkboard-user" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+            <p style="font-size:14px;">No upcoming workshops scheduled at this time. Check back later.</p>
+          </div>
+        </div>
+      </div>
+
+        </main>
+  </div>
+
+  <script>
+    function showSection(name, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById('sec-' + name);
+      if (target) target.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.querySelector('.main').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function animateBars() {
+      document.querySelectorAll('.progress-fill[data-progress]').forEach(el => {
+        const w = parseFloat(el.getAttribute('data-progress') || 0);
+        el.style.width = '0%';
+        requestAnimationFrame(() => {
+          setTimeout(() => { el.style.width = w + '%'; }, 80);
+        });
+      });
+    }
+
+    async function saveSkill() {
+      const name   = document.getElementById('skill-name').value.trim();
+      const level  = document.getElementById('skill-level').value;
+      const status = document.getElementById('skill-status');
+      if (!name) { status.innerHTML = '<span style="color:#e74c3c;">Please enter a skill name.</span>'; return; }
+      status.innerHTML = '<span style="color:var(--text-gray);"><i class="fa-solid fa-spinner fa-spin"></i> Saving…</span>';
+      try {
+        const res  = await fetch('/api/employee/skill/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ skill_name: name, proficiency_level: level }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.innerHTML = '<span style="color:#02a479;"><i class="fa-solid fa-check-circle"></i> Skill saved!</span>';
+          document.getElementById('skill-name').value = '';
+          setTimeout(() => { status.innerHTML = ''; location.reload(); }, 1200);
+        } else {
+          status.innerHTML = `<span style="color:#e74c3c;"><i class="fa-solid fa-circle-xmark"></i> ${data.message || 'Unknown error'}</span>`;
+        }
+      } catch (e) {
+        status.innerHTML = '<span style="color:#e74c3c;"><i class="fa-solid fa-circle-xmark"></i> Network error. Please try again.</span>';
+      }
+    }
+
+    async function uploadCert() {
+      const file   = document.getElementById('cert-file').files[0];
+      const name   = document.getElementById('cert-name').value.trim();
+      const org    = document.getElementById('cert-org').value.trim();
+      const status = document.getElementById('cert-status');
+      if (!file || !name) { status.innerHTML = '<span style="color:#e74c3c;">File and certificate name are required.</span>'; return; }
+      status.innerHTML = '<span style="color:var(--text-gray);"><i class="fa-solid fa-spinner fa-spin"></i> Uploading…</span>';
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('cert_name', name);
+      fd.append('issuer', org);
+      try {
+        const res  = await fetch('/api/employee/cert/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (data.success) {
+          status.innerHTML = '<span style="color:#02a479;"><i class="fa-solid fa-check-circle"></i> Certificate uploaded successfully!</span>';
+          document.getElementById('cert-file').value = '';
+          document.getElementById('cert-name').value = '';
+          document.getElementById('cert-org').value  = '';
+          setTimeout(() => { status.innerHTML = ''; location.reload(); }, 1500);
+        } else {
+          status.innerHTML = `<span style="color:#e74c3c;"><i class="fa-solid fa-circle-xmark"></i> ${data.message || 'Unknown error'}</span>`;
+        }
+      } catch (e) {
+        status.innerHTML = '<span style="color:#e74c3c;"><i class="fa-solid fa-circle-xmark"></i> Network error. Please try again.</span>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', animateBars);
+    if (window !== window.top) document.body.classList.add('embedded');
+
+    // ── Delete Certificate ────────────────────────────────────
+    // FIX for S3/DB sync issue:
+    // Previously, deleting from S3 left the DB record intact, so the file
+    // remained visible on the frontend. Now we call the backend which:
+    //   1) Deletes the S3 object
+    //   2) Hard-deletes the DB row in EMP_NRM_DOCUMENTS
+    //   3) Returns success → we immediately remove the <tr> from the DOM
+    // Result: frontend is always in sync with both S3 and the database.
+    async function deleteCert(certId, filePath, btn) {
+      if (!confirm('Are you sure you want to delete this certificate? This action cannot be undone.')) return;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting…';
+      try {
+        const res  = await fetch('/api/employee/cert/delete', {
+          method:  'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ cert_id: certId, file_path: filePath }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Remove row from DOM immediately — no stale S3 link visible
+          const row = btn.closest('tr');
+          if (row) row.remove();
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete';
+          alert('Delete failed: ' + (data.message || 'Unknown error'));
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete';
+        alert('Network error. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>

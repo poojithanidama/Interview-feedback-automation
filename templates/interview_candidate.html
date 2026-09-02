@@ -1,0 +1,94 @@
+{% extends "interview_base.html" %}
+{% block title %}{{ candidate.candidate }}{% endblock %}
+{% block content %}
+<a class="back-link" href="/interview">&larr; All candidates</a>
+
+{% if submitted %}<div class="toast">Feedback submitted.</div>{% endif %}
+{% if updated %}<div class="toast">Feedback updated.</div>{% endif %}
+
+<header class="page-head">
+  <div>
+    <h1>{{ candidate.candidate }}</h1>
+    <p class="sub">{{ candidate.position }} &middot; {{ candidate.rounds_completed }} round{{ 's' if candidate.rounds_completed != 1 else '' }} completed</p>
+  </div>
+  <div class="detail-actions">
+    <span class="badge badge-lg {{ rec_class(candidate.final_recommendation) }}">{{ candidate.final_recommendation }}</span>
+    <form method="post" action="/interview/candidate/{{ candidate.candidate }}/delete"
+          onsubmit="return confirm('Remove {{ candidate.candidate }} and all their feedback? This can\'t be undone.');">
+      <button type="submit" class="btn-delete">Delete candidate</button>
+    </form>
+  </div>
+</header>
+
+<div class="detail-grid">
+  <section class="card">
+    <h3>Score breakdown</h3>
+    <div class="score-bars">
+      {% for label, value in candidate.dimension_averages.items() %}
+      <div class="score-row">
+        <span class="score-label">{{ label }}</span>
+        <div class="score-track"><div class="score-fill" style="width: {{ ((value / 5) * 100) | round(1) }}%;"></div></div>
+        <span class="score-value">{{ '%.1f' | format(value) }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="overall-line">Overall average <strong>{{ '%.2f' | format(candidate.overall_average) }}</strong> / 5</div>
+  </section>
+
+  <section class="card">
+    <h3>Interview timeline</h3>
+    <div class="timeline">
+      {% for r in rounds %}
+      <div class="timeline-item">
+        <div class="timeline-head">
+          <strong>{{ r.interview_round }}</strong>
+          <div class="timeline-head-actions">
+            <span class="badge {{ rec_class(r.recommendation) }}">{{ r.recommendation }}</span>
+            <a class="link-edit" href="/interview/feedback/{{ r.id }}/edit">Edit</a>
+            <form method="post" action="/interview/feedback/{{ r.id }}/delete"
+                  onsubmit="return confirm('Delete this {{ r.interview_round }} entry from {{ r.interviewer_name }}?');">
+              <button type="submit" class="link-delete">Delete</button>
+            </form>
+          </div>
+        </div>
+
+        <p class="meta">{{ r.interviewer_name }} &middot; {{ r.interview_date }}</p>
+
+        {% if '1' in r.interview_round %}
+          {% set score_items = [
+            ('Communication & Soft skills', r.round1_communication_soft_skills),
+            ('Basic Technical/Skill Assessment', r.round1_basic_technical_skill_assessment),
+            ('Project explanation', r.round1_project_explanation),
+            ('Logical Ability', r.round1_logical_ability),
+            ('Resume', r.round1_resume)
+          ] %}
+        {% else %}
+          {% set score_items = [
+            ('Introduction', r.round2_introduction),
+            ('General programming', r.round2_general_programming),
+            ('Python basics', r.round2_python_basics),
+            ('Python advanced', r.round2_python_advanced),
+            ('OOPS', r.round2_oops),
+            ('Projects', r.round2_projects),
+            ('Pending resume', r.round2_pending_resume),
+            ('Other technologies', r.round2_other_technologies),
+            ('Good attitude', r.round2_good_attitude),
+            ('Confidence', r.round2_confidence)
+          ] %}
+        {% endif %}
+
+        <div class="round-score-list">
+          {% for label, value in score_items %}
+            {% if value is not none %}
+            <div class="round-score"><span>{{ label }}</span><strong>{{ value }}/5</strong></div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if r.comments %}<p class="comment">{{ r.comments }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

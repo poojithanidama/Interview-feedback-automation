@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Salary Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box;
+            font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+        body { background:#f4f6f8; padding:20px; }
+        .container { max-width:1000px; margin:auto; background:#fff;
+            padding:30px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,.1); }
+        h2 { text-align:center; color:#333; margin-bottom:24px; }
+        h3 { color:#444; margin-bottom:15px; border-bottom:2px solid #007bff;
+            padding-bottom:8px; font-size:1.05rem; }
+
+        /* ── Summary card ── */
+        .salary-summary {
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color:#fff; padding:25px; border-radius:8px; margin-bottom:28px;
+            display:grid; grid-template-columns:1fr 1fr; gap:12px 30px;
+        }
+        .salary-summary h3 { grid-column:1/-1; color:#fff;
+            border-bottom-color:rgba(255,255,255,.35); }
+        .summary-item { display:flex; flex-direction:column; gap:3px; }
+        .summary-item .lbl { font-size:.78em; opacity:.8;
+            text-transform:uppercase; letter-spacing:.5px; }
+        .summary-item .val { font-size:.97em; font-weight:600; }
+        .badge { display:inline-block; background:#28a745; color:#fff;
+            padding:3px 10px; border-radius:12px; font-size:.82em; font-weight:600; }
+        .badge.inactive { background:#dc3545; }
+
+        /* ── Sections ── */
+        .section { margin-bottom:28px; }
+
+        /* ── Salary grid ── */
+        .salary-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .salary-item { display:flex; justify-content:space-between; align-items:center;
+            padding:14px 18px; background:#f8f9fa; border-radius:6px;
+            border-left:4px solid #007bff; }
+        .salary-item.net { grid-column:1/-1; background:#d4edda;
+            border-left-color:#28a745; font-weight:bold; font-size:1.1em; }
+        .salary-item.net .amt { color:#155724; }
+        .salary-item .lbl { color:#555; }
+        .salary-item .amt { font-weight:600; color:#333; }
+
+        /* ── Bank grid ── */
+        .bank-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .bank-item { padding:14px 18px; background:#f0f4ff;
+            border-radius:6px; border-left:4px solid #4a6cf7; }
+        .bank-item .lbl { font-size:.78em; color:#666;
+            text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+        .bank-item .val { font-weight:600; color:#222; font-size:.97em; }
+        .bank-item.wide { grid-column:1/-1; }
+        .masked { letter-spacing:2px; }
+
+        /* ── Alerts / no-data ── */
+        .alert { padding:12px 15px; border-radius:4px; margin-bottom:20px;
+            display:flex; align-items:center; gap:10px; }
+        .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+        .no-data { text-align:center; padding:40px 30px; background:#f8f9fa;
+            border-radius:8px; margin:16px 0; }
+        .no-data i { font-size:2.5rem; color:#aaa; margin-bottom:12px; display:block; }
+        .no-data p { color:#777; margin-top:6px; font-size:.93em; }
+
+        /* ── Back link ── */
+        .back-link { display:inline-block; margin-top:24px;
+            color:#0078D4; text-decoration:none; font-weight:500; }
+        .back-link:hover { text-decoration:underline; }
+
+        @media(max-width:600px){
+            .salary-summary,.salary-grid,.bank-grid { grid-template-columns:1fr; }
+            .salary-item.net,.bank-item.wide { grid-column:1; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2><i class="fas fa-money-bill-wave"></i> Employee Salary Details</h2>
+
+    {% if error %}
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if salary_info %}
+
+    <!-- Employee Summary -->
+    <div class="salary-summary">
+        <h3><i class="fas fa-id-badge"></i> Employee Information</h3>
+        <div class="summary-item">
+            <span class="lbl">Employee ID</span>
+            <span class="val">{{ salary_info.id }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Full Name</span>
+            <span class="val">{{ salary_info.name }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Department</span>
+            <span class="val">{{ salary_info.department }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Designation</span>
+            <span class="val">{{ salary_info.designation }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Employment Type</span>
+            <span class="val">{{ salary_info.employment_type }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Joining Date</span>
+            <span class="val">
+                {% if salary_info.joining_date %}
+                    {% if salary_info.joining_date is string %}{{ salary_info.joining_date }}
+                    {% else %}{{ salary_info.joining_date.strftime('%d %b %Y') }}{% endif %}
+                {% else %}N/A{% endif %}
+            </span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Email</span>
+            <span class="val">{{ salary_info.email }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="lbl">Status</span>
+            <span class="val">
+                <span class="badge {% if salary_info.status|upper != 'ACTIVE' %}inactive{% endif %}">
+                    {{ salary_info.status }}
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Salary Breakdown -->
+    <div class="section">
+        <h3><i class="fas fa-chart-pie"></i> Salary Breakdown</h3>
+        {% if salary_info.has_salary %}
+        <div class="salary-grid">
+            <div class="salary-item">
+                <span class="lbl">Basic</span>
+                <span class="amt">&#8377; {{ "{:,.2f}".format(salary_info.basic) }}</span>
+            </div>
+            <div class="salary-item">
+                <span class="lbl">HRA</span>
+                <span class="amt">&#8377; {{ "{:,.2f}".format(salary_info.hra) }}</span>
+            </div>
+            <div class="salary-item">
+                <span class="lbl">Allowances</span>
+                <span class="amt">&#8377; {{ "{:,.2f}".format(salary_info.allowances) }}</span>
+            </div>
+            <div class="salary-item">
+                <span class="lbl">Gross Salary</span>
+                <span class="amt">&#8377; {{ "{:,.2f}".format(salary_info.gross_salary) }}</span>
+            </div>
+            <div class="salary-item net">
+                <span class="lbl"><i class="fas fa-wallet"></i> Net Salary</span>
+                <span class="amt">&#8377; {{ "{:,.2f}".format(salary_info.net_salary) }}</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-data">
+            <i class="fas fa-file-invoice-dollar"></i>
+            <p>Salary details have not been entered yet.</p>
+            <p>Please contact HR for assistance.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bank Details -->
+    <div class="section">
+        <h3><i class="fas fa-university"></i> Bank Details</h3>
+        {% if bank_details and bank_details.has_bank %}
+        <div class="bank-grid">
+            <div class="bank-item">
+                <div class="lbl">Bank Name</div>
+                <div class="val">{{ bank_details.bank_name }}</div>
+            </div>
+            <div class="bank-item">
+                <div class="lbl">Account Number</div>
+                <div class="val masked">{{ bank_details.account_number }}</div>
+            </div>
+            <div class="bank-item wide">
+                <div class="lbl">IFSC Code</div>
+                <div class="val">{{ bank_details.ifsc_code }}</div>
+            </div>
+        </div>
+        {% else %}
+        <div class="no-data">
+            <i class="fas fa-piggy-bank"></i>
+            <p>No bank details found for your account.</p>
+            <p>Please contact HR to add your bank information.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div class="no-data">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>Unable to load salary information.</p>
+        <p>Please try again later or contact the system administrator.</p>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('employee_resources') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Employee Resources
+    </a>
+</div>
+</body>
+</html>

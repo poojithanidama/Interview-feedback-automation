@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alignment Charter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e3eeff, #f5faff);
+            padding: 40px 20px;
+        }
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            max-width: 1000px;
+            margin: auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        h2 {
+            text-align: center;
+            color: #1d2d50;
+            font-size: 30px;
+            font-weight: 700;
+        }
+        .warning {
+            color: red;
+            font-weight: 600;
+            text-align: center;
+            margin: 20px 0;
+        }
+        ul li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        button {
+            padding: 14px 25px;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #9ca3af;
+        }
+        .cancel-btn {
+            background: #9ca3af;
+        }
+        .success-message {
+            background: #e7ffe7;
+            border-left: 5px solid #16a34a;
+            padding: 14px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        /* ===== Top Navigation ===== */
+.top-nav{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:25px;
+}
+
+.top-nav button{
+  padding:10px 18px;
+  border:none;
+  border-radius:10px;
+  background:#eef0ff;
+  color:#5b5fe6;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.top-nav button:hover{
+  background:#dde0ff;
+}
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="top-nav">
+    <button onclick="window.location.href='/'">🏠 Home</button>
+    <button onclick="window.location.href='/org-track-login'">🏢 Organization Sign Off</button>
+  </div>
+
+
+    <!-- ✅ FLASH MESSAGE (ONLY AFTER SUBMIT) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="success-message">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h2>Alignment Charter</h2>
+
+    <p class="warning">
+        Please kindly read carefully before proceeding to submit
+    </p>
+
+    <ul>
+        <li>ChakoraHub identity and branding must not be misused.</li>
+        <li>All shared documents and credentials are confidential.</li>
+        <li>Conflicts must be resolved internally.</li>
+        <li>Transparent communication is mandatory.</li>
+        <li>Ethical and responsible work practices must be followed.</li>
+    </ul>
+
+    <!-- ✅ REAL FORM SUBMIT -->
+    <form method="POST" action="/alignment-submit">
+        <label style="display:flex;gap:12px;margin-top:20px">
+            <input type="checkbox" id="agreeChk" required>
+            <span>
+                I have carefully read the Alignment Charter & I will comply
+                with all stated responsibilities.
+            </span>
+        </label>
+
+        <button type="submit" id="submitBtn">
+            Submit BRS
+        </button>
+    </form>
+
+    <button class="cancel-btn" type="button" onclick="window.location.href='/'">
+        Cancel
+    </button>
+
+</div>
+</body>
+</html>

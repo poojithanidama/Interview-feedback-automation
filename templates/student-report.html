@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Report</title>
+  <style>
+    body { font-family: Arial; background:#f4f6f8; }
+    .card {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.2);
+    }
+    h2 { text-align:center; }
+    p { font-size: 15px; }
+    strong { color:#3949ab; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Student Report</h2>
+
+  <p><strong>First Name:</strong> {{ student.FIRST_NAME }}</p>
+  <p><strong>Registration ID:</strong> {{ student.REGISTRATION_ID }}</p>
+  <p><strong>Email:</strong> {{ student.EMAIL }}</p>
+  <p><strong>Phone:</strong> {{ student.PHONE }}</p>
+  <p><strong>Address:</strong> {{ student.ADDRESS }}</p>
+
+  {% if student.RESUME_PATH %}
+    <p>
+      <strong>Resume:</strong>
+      <a href="{{ student.RESUME_PATH }}" target="_blank">Download</a>
+    </p>
+  {% else %}
+    <p><strong>Resume:</strong> Not Available</p>
+  {% endif %}
+
+</div>
+
+</body>
+</html>

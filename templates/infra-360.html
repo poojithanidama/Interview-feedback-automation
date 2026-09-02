@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Infra 360 — ChakoraHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary:   #78c0c4;
+      --primary-d: #4a8a8e;
+      --text-dark: #1a1830;
+      --text-mid:  #4a4869;
+      --text-gray: #9ba0b4;
+      --border:    #f0f0f5;
+      --bg:        #ffffff;
+      --radius:    18px;
+    }
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'DM Sans',sans-serif;
+      background:var(--bg); color:var(--text-dark);
+      min-height:100vh; -webkit-font-smoothing:antialiased;
+    }
+
+    /* ── Embedded ──────────────────────────────── */
+    body.embedded { background:transparent !important; }
+    body.embedded .sidebar { background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); }
+    body.embedded .topbar  { display:none !important; }
+    body.embedded .layout  { min-height:100vh; }
+
+    /* ── Topbar ─────────────────────────────────── */
+    .topbar {
+      position:sticky; top:0; z-index:20;
+      background:#fff; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-badge {
+      width:42px; height:42px; border-radius:12px;
+      background:linear-gradient(135deg,#78c0c4,#4a8a8e);
+      display:grid; place-items:center; color:#fff; font-size:17px;
+    }
+    .brand-text strong { display:block; font-family:'Space Grotesk',sans-serif; font-size:17px; color:var(--text-dark); letter-spacing:-0.2px; }
+    .brand-text span   { color:var(--text-gray); font-size:12px; font-weight:500; }
+    .profile-area { display:flex; align-items:center; gap:12px; }
+    .avatar {
+      width:40px; height:40px; border-radius:50%;
+      background:#1a1830; display:grid; place-items:center;
+      color:#fff; font-weight:700; font-size:15px;
+      border:2px solid var(--border); transition:border-color .2s;
+    }
+    .avatar:hover { border-color:var(--primary); }
+    .profile-info { text-align:right; }
+    .profile-info strong { display:block; font-size:13px; color:var(--text-dark); }
+    .profile-info span   { font-size:12px; color:var(--text-gray); }
+
+    /* ── Layout ─────────────────────────────────── */
+    .layout { display:flex; min-height:calc(100vh - 73px); }
+
+    /* ── Sidebar ─────────────────────────────────── */
+    .sidebar {
+      width:234px; flex-shrink:0;
+      background:var(--bg); border-right:1px solid var(--border);
+      padding:28px 18px; display:flex; flex-direction:column; gap:2px;
+      position:sticky; top:73px; height:calc(100vh - 73px); overflow-y:auto;
+    }
+    .sl {
+      font-size:10px; font-weight:700; letter-spacing:0.8px;
+      text-transform:uppercase; color:var(--text-gray);
+      padding:14px 10px 6px; margin-top:4px;
+    }
+    .nav-item {
+      display:flex; align-items:center; gap:11px;
+      padding:10px 14px; border-radius:12px;
+      color:var(--text-gray); cursor:pointer;
+      font-size:13px; font-weight:600;
+      border:none; background:none; width:100%; text-align:left;
+      transition:all .2s ease; position:relative;
+    }
+    .nav-item .ni { width:22px; font-size:14px; text-align:center; flex-shrink:0; transition:color .2s; }
+    .nav-item:hover { color:var(--text-dark); background:rgba(120,192,196,0.1); }
+    .nav-item:hover .ni { color:var(--primary-d); }
+    .nav-item.active { background:rgba(120,192,196,0.15); color:var(--primary-d); font-weight:700; }
+    .nav-item.active .ni { color:var(--primary-d); }
+    .nav-item.active::before {
+      content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+      width:3px; height:55%; background:var(--primary-d); border-radius:0 3px 3px 0;
+    }
+
+    /* ── Main ────────────────────────────────────── */
+    .main { flex:1; padding:36px 36px 40px; overflow-y:auto; }
+    .section { display:none; }
+    .section.active { display:block; animation:fadeUp .32s ease both; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── Hero banner (Finance-style, infra teal palette) ── */
+    .hero-banner {
+      border-radius:var(--radius);
+      background:linear-gradient(120deg,#0a1a1b 0%,#102628 55%,#081a1c 100%);
+      padding:32px 36px; color:#fff; position:relative; overflow:hidden;
+      margin-bottom:28px;
+    }
+    .hero-banner::before {
+      content:''; position:absolute; right:-80px; top:-80px;
+      width:300px; height:300px;
+      background:radial-gradient(circle,rgba(120,192,196,0.18) 0%,transparent 65%);
+      border-radius:50%;
+    }
+    .hero-inner { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .hero-text h2 { font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:700; margin-bottom:8px; letter-spacing:-0.4px; }
+    .hero-text p  { font-size:13px; color:rgba(255,255,255,0.6); font-weight:500; }
+    .hero-stat { text-align:right; }
+    .hero-stat .hs-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
+    .hero-stat .hs-value {
+      font-family:'Space Grotesk',sans-serif;
+      font-size:28px; font-weight:700; letter-spacing:-0.8px;
+      background:linear-gradient(135deg,#78c0c4,#a8dfe2);
+      background-clip:text;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+
+    /* ── Stat cards ──────────────────────────────── */
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .stat-card {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:20px;
+      transition:transform .22s ease, box-shadow .22s ease;
+      position:relative; overflow:hidden;
+    }
+    .stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.07); }
+    .stat-icon { width:40px; height:40px; border-radius:11px; display:grid; place-items:center; font-size:16px; color:#fff; margin-bottom:14px; }
+    .stat-value { font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:var(--text-dark); margin-bottom:4px; letter-spacing:-0.3px; }
+    .stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-gray); }
+
+    /* ── Panels ──────────────────────────────────── */
+    .panel {
+      background:#fff; border-radius:var(--radius);
+      border:1px solid var(--border); padding:24px;
+      margin-bottom:24px; box-shadow:0 2px 12px rgba(0,0,0,0.03);
+    }
+    .panel-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);
+    }
+    .panel-title { font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; color:var(--text-dark); display:flex; align-items:center; gap:9px; }
+    .panel-title i { font-size:13px; color:var(--text-gray); }
+    .section-header { margin-bottom:28px; }
+    .page-title    { font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700; color:var(--text-dark); letter-spacing:-0.3px; margin-bottom:4px; }
+    .page-subtitle { font-size:13px; color:var(--text-gray); font-weight:500; }
+
+    /* ── Spec rows ───────────────────────────────── */
+    .spec-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    .spec-item {
+      padding:18px 20px; border-radius:12px;
+      background:#fafafa; border:1px solid var(--border);
+      display:flex; flex-direction:column; gap:6px;
+      transition:background .2s;
+    }
+    .spec-item:hover { background:rgba(120,192,196,0.06); }
+    .spec-item .spec-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-gray); }
+    .spec-item .spec-val   { font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; color:var(--text-dark); }
+
+    /* ── Tables ──────────────────────────────────── */
+    table { width:100%; border-collapse:collapse; }
+    thead th {
+      text-align:left; padding:11px 14px;
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+      color:var(--text-gray); border-bottom:2px solid var(--border);
+    }
+    tbody td {
+      padding:14px; font-size:13px; font-weight:500;
+      color:var(--text-dark); border-bottom:1px solid var(--border);
+    }
+    tbody tr { transition:background .15s; }
+    tbody tr:hover td { background:rgba(120,192,196,0.04); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    /* ── Badges ──────────────────────────────────── */
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:5px 11px; border-radius:20px; font-size:11px; font-weight:700; }
+    .b-active  { background:rgba(5,205,153,0.12); color:#02a479; }
+    .b-pending { background:rgba(254,206,32,0.18); color:#d4a700; }
+    .b-gray    { background:#f0f0f5; color:var(--text-gray); }
+    .b-teal    { background:rgba(120,192,196,0.15); color:var(--primary-d); }
+    .b-red     { background:rgba(238,93,80,0.1); color:#ee5d50; }
+
+    /* ── Forms ───────────────────────────────────── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .form-group { display:flex; flex-direction:column; gap:7px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:11px; font-weight:700; color:var(--text-gray); text-transform:uppercase; letter-spacing:0.5px; }
+    input, select, textarea {
+      width:100%; padding:10px 14px;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+      color:var(--text-dark); background:#fff; outline:none;
+      transition:border-color .2s, box-shadow .2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color:var(--primary-d);
+      box-shadow:0 0 0 3px rgba(120,192,196,0.15);
+    }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:8px; padding:10px 20px; border-radius:10px;
+      font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+      cursor:pointer; border:none; transition:all .2s ease;
+    }
+    .btn-primary { background:var(--primary-d); color:#fff; }
+    .btn-primary:hover { background:#3a7275; transform:translateY(-1px); box-shadow:0 4px 12px rgba(74,138,142,0.3); }
+    .btn-outline { background:transparent; color:var(--text-mid); border:1.5px solid var(--border); }
+    .btn-outline:hover { background:#fafafa; border-color:#d0d0dc; }
+
+    /* ── Empty state ─────────────────────────────── */
+    .empty-state { padding:36px 0; text-align:center; color:var(--text-gray); }
+    .empty-state i { font-size:30px; margin-bottom:12px; opacity:0.35; display:block; }
+    .empty-state p { font-size:13px; font-weight:500; }
+
+    /* ── Scrollbar ───────────────────────────────── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#e0e0e8; border-radius:4px; }
+
+    @media(max-width:900px) {
+      .stats-grid { grid-template-columns:repeat(2,1fr); }
+      .spec-grid  { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-server"></i></div>
+      <div class="brand-text">
+        <strong>Infra 360</strong>
+        <span>Infrastructure &amp; asset portal</span>
+      </div>
+    </div>
+    <div class="profile-area">
+      <div class="profile-info">
+        <strong>{{ emp_name or employee_name or 'Employee' }}</strong>
+        <span>ID: {{ emp_id or employee_id or 'N/A' }}</span>
+      </div>
+      <div class="avatar">{{ ((emp_name or employee_name or 'E')[0]) }}</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sl">Navigation</div>
+      <button class="nav-item active" onclick="showSection('overview',this)">
+        <span class="ni"><i class="fa-solid fa-chart-line"></i></span> Overview
+      </button>
+      <button class="nav-item" onclick="showSection('assets',this)">
+        <span class="ni"><i class="fa-solid fa-laptop-code"></i></span> Asset Details
+      </button>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+      <!-- ══ OVERVIEW ══════════════════════════════ -->
+      <div class="section active" id="sec-overview">
+
+        <div class="hero-banner">
+          <div class="hero-inner">
+            <div class="hero-text">
+              <h2>Infra Overview</h2>
+              <p>{{ department or 'N/A' }} &nbsp;·&nbsp; {{ designation or 'N/A' }}</p>
+            </div>
+            <div class="hero-stat">
+              <div class="hs-label">Asset Status</div>
+              <div class="hs-value">{{ status or 'N/A' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#78c0c4,#4a8a8e);">
+              <i class="fa-solid fa-desktop"></i>
+            </div>
+            <div class="stat-value" style="font-size:16px;">{{ asset_type or 'No asset' }}</div>
+            <div class="stat-label">Asset Category</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#6534ff,#5226d9);">
+              <i class="fa-solid fa-barcode"></i>
+            </div>
+            <div class="stat-value" style="font-size:16px;">{{ asset_name or serial_number or 'N/A' }}</div>
+            <div class="stat-label">Device / Serial</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#05cd99,#02a479);">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-value" style="font-size:16px;">{{ allocation_date or 'N/A' }}</div>
+            <div class="stat-label">Allocation Date</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:linear-gradient(135deg,#fe7d55,#e0623a);">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="stat-value" style="font-size:16px;">{{ status or 'N/A' }}</div>
+            <div class="stat-label">Asset Status</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-laptop"></i> Asset Summary</div>
+            <span class="badge b-{{ 'active' if status == 'Active' else 'pending' }}">
+              <i class="fa-solid fa-circle" style="font-size:7px;"></i>
+              {{ status or 'N/A' }}
+            </span>
+          </div>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <span class="spec-label">Asset Category</span>
+              <span class="spec-val">{{ asset_type or 'N/A' }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Serial / Tag ID</span>
+              <span class="spec-val">{{ serial_number or asset_name or 'N/A' }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Allocated On</span>
+              <span class="spec-val">{{ allocation_date or 'N/A' }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Operational Status</span>
+              <span class="spec-val">{{ status or 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ASSET DETAILS ══════════════════════════ -->
+      <div class="section" id="sec-assets">
+        <div class="section-header">
+          <div class="page-title">Hardware Specifications</div>
+          <div class="page-subtitle">Full log of your currently assigned machine.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><i class="fa-solid fa-laptop-code"></i> Assigned Device</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th><th>Serial / Tag ID</th>
+                <th>Date Allocated</th><th style="text-align:right;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">{{ asset_type or 'N/A' }}</td>
+                <td>{{ serial_number or 'N/A' }}</td>
+                <td>{{ allocation_date or 'N/A' }}</td>
+                <td style="text-align:right;">
+                  <span class="badge b-{{ 'active' if status == 'Active' else 'pending' }}">
+                    <i class="fa-solid fa-circle" style="font-size:7px;"></i>
+                    {{ status or 'N/A' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function showSection(name, el) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const t = document.getElementById('sec-' + name);
+      if (t) t.classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.querySelector('.main').scrollTo({ top:0, behavior:'smooth' });
+    }
+
+    if (window !== window.top) document.body.classList.add('embedded');
+  </script>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Application Tracking</title>
+    <style>
+        /* ====== NEW: Top header styles (same style as employee-report header) ====== */
+        .top-header {
+            background: linear-gradient(90deg, #3e70d6, #4b8bff);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        }
+        .top-header img.logo {
+            height: 55px;
+        }
+        .top-header .title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .top-header .profile {
+            height: 48px;
+            width: 48px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .top-header .profile-wrapper {
+            position: relative;
+        }
+        .top-header .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: white;
+            color: #333;
+            border-radius: 6px;
+            min-width: 160px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+            z-index: 1000;
+        }
+        .top-header .dropdown-menu a {
+            display:block;
+            padding:10px 12px;
+            text-decoration:none;
+            color:#333;
+            border-bottom:1px solid #eee;
+        }
+        .top-header .dropdown-menu a:last-child{border-bottom:none;}
+        .top-header .dropdown-menu a:hover{background:#f6f6f6;}
+
+        /* ========== ORIGINAL CSS (kept unchanged) ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .applications-table {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-uploaded { background: #e3f2fd; color: #1976d2; }
+        .status-review { background: #fff3e0; color: #f57c00; }
+        .status-interview { background: #f3e5f5; color: #7b1fa2; }
+        .status-selected { background: #e8f5e9; color: #388e3c; }
+        .status-rejected { background: #ffebee; color: #d32f2f; }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-update {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view {
+            background: #00a86b;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #d32f2f;
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit.loading {
+            opacity: 0.9;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn-submit.loading::after {
+            content: "";
+            width: 14px;
+            height: 14px;
+            margin-left: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: -2px;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 10px 15px;
+            background-color: #667eea;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .back-button:hover {
+            background-color: #5a6fd8;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel,
+        .btn-danger {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 280px;
+            max-width: 360px;
+            background: #1f2937;
+            color: #fff;
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #60a5fa;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            border-left-color: #22c55e;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== NEW HEADER (inserted) ===== -->
+    <div class="top-header">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="Logo">
+        <div class="title">Admin Dashboard</div>
+        <div class="profile-wrapper" onclick="toggleTopDropdown()">
+            <img src="{{ profile_pic if profile_pic else url_for('static', filename='profile_photo/defaultpicture.jpg') }}" class="profile" alt="Profile">
+            <div class="dropdown-menu" id="topDropdown">
+                <a href="{{ url_for('profile') }}">Profile</a>
+                <a href="{{ url_for('settings') }}">Settings</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ORIGINAL CONTENT STARTS HERE (unchanged) ===== -->
+    <div class="header">
+        <h1>Application Tracking - Admin Dashboard</h1>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number" id="totalApps">0</div>
+            <div class="stat-label">Total Applications</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="pendingApps">0</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="interviewApps">0</div>
+            <div class="stat-label">In Interview</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="selectedApps">0</div>
+            <div class="stat-label">Selected</div>
+        </div>
+    </div>
+
+    <div class="applications-table">
+        <h2 style="margin-bottom: 20px;">All Applications</h2>
+        
+        <div class="loading" id="loading">Loading applications...</div>
+
+        <table id="applicationsTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Application ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Applied Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Update Application Status</h2>
+            </div>
+            
+            <div class="form-group">
+                <label>Application ID</label>
+                <input type="text" id="modalAppId" readonly style="background: #f5f5f5; padding: 10px; width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+
+            <div class="form-group">
+                <label>New Status *</label>
+                <select id="newStatus" required>
+                    <option value="">Select Status</option>
+                    <option value="Pending for Review">Pending for Review</option>
+                    <option value="1st Round Interview">1st Round Interview</option>
+                    <option value="2nd Round Interview">2nd Round Interview</option>
+                    <option value="Selected">Selected</option>
+                    <option value="Rejected">Rejected</option>
+                    <option value="Evaluation in Progress">Evaluation in Progress</option>
+                    <option value="Consent from Applicant">Consent from Applicant</option>
+                    <option value="Offer Letter Sent">Offer Letter Sent</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notes (Optional)</label>
+                <textarea id="statusNotes" placeholder="Add any notes..."></textarea>
+            </div>
+
+            <button class="btn-submit" onclick="updateStatus()">Update Status</button>
+        </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeDeleteModal()">&times;</span>
+                <h2>Delete Application</h2>
+            </div>
+            <p>Are you sure you want to delete this application?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-danger" id="confirmDeleteBtn" onclick="confirmDeleteApplication()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="/employee-resources" class="back-button">Back to Resources</a>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+    /* ===== NEW: Top header dropdown toggle (minimal helper) ===== */
+    function toggleTopDropdown() {
+        const dd = document.getElementById('topDropdown');
+        dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+    }
+    document.addEventListener('click', function(e){
+        const wrapper = document.querySelector('.profile-wrapper');
+        if (!wrapper.contains(e.target)) {
+            const dd = document.getElementById('topDropdown');
+            if(dd) dd.style.display = 'none';
+        }
+    });
+
+    /* ===== ORIGINAL SCRIPTS (kept unchanged) ===== */
+    let allApplications = [];
+    let deleteTargetAppId = null;
+
+    window.onload = function() {
+        loadApplications();
+    };
+
+    async function loadApplications() {
+        try {
+            const response = await fetch('/api/onboarding/applications');
+            const result = await response.json();
+
+            const data = (typeof result.body === "string") ? JSON.parse(result.body) : result;
+            allApplications = data.applications || [];
+
+            displayApplications();
+            updateStats();
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('applicationsTable').style.display = 'table';
+
+        } catch (error) {
+            document.getElementById('loading').innerHTML = `
+                <p style="color:#d32f2f;">Error loading applications: ${error.message}</p>
+                <button onclick="loadApplications()">Retry</button>
+            `;
+        }
+    }
+
+    function displayApplications() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        allApplications.forEach(app => {
+            const row = document.createElement('tr');
+            const statusClass = getStatusClass(app.status);
+
+            row.innerHTML = `
+    <td>${app.application_id}</td>
+    <td>${app.name}</td>
+    <td>${app.email}</td>
+    <td>${new Date(app.applied_date).toLocaleDateString()}</td>
+    <td><span class="status-badge ${statusClass}">${app.status}</span></td>
+    <td>
+        <button class="action-btn btn-update" onclick="openUpdateModal('${app.application_id}')">Update</button>
+        <button class="action-btn btn-view" onclick="viewApplication('${app.application_id}')">View</button>
+        <button class="action-btn btn-delete" style="background:red; color:white"
+            onclick="deleteApplication('${app.application_id}')">
+            Delete
+        </button>
+        <button class="action-btn" onclick="downloadResume('${app.application_id}')">Download</button>
+
+    </td>
+`;
+
+
+            tbody.appendChild(row);
+        });
+    }
+
+    function updateStats() {
+        document.getElementById('totalApps').textContent = allApplications.length;
+
+        document.getElementById('pendingApps').textContent =
+            allApplications.filter(a => a.status === 'Pending for Review').length;
+
+        document.getElementById('interviewApps').textContent =
+            allApplications.filter(a =>
+                a.status === '1st Round Interview' || a.status === '2nd Round Interview'
+            ).length;
+
+        document.getElementById('selectedApps').textContent =
+            allApplications.filter(a => a.status === 'Selected').length;
+    }
+
+    function getStatusClass(status) {
+    if (!status) return 'status-review';
+    if (status.includes('Upload')) return 'status-uploaded';
+    if (status.includes('Review')) return 'status-review';
+    if (status.includes('Interview')) return 'status-interview';
+    if (status === 'Selected') return 'status-selected';
+    if (status === 'Rejected') return 'status-rejected';
+    return 'status-review';
+}
+
+    function openUpdateModal(appId) {
+        document.getElementById('modalAppId').value = appId;
+        document.getElementById('newStatus').value = '';
+        document.getElementById('statusNotes').value = '';
+        document.getElementById('updateModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('updateModal').style.display = 'none';
+    }
+
+    function openDeleteModal(appId) {
+        deleteTargetAppId = appId;
+        document.getElementById('deleteConfirmModal').style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+        deleteTargetAppId = null;
+        document.getElementById('deleteConfirmModal').style.display = 'none';
+    }
+
+    function setUpdateButtonLoading(isLoading) {
+        const btn = document.querySelector('#updateModal .btn-submit');
+        if (!btn) return;
+        if (!btn.dataset.originalText) {
+            btn.dataset.originalText = btn.textContent;
+        }
+        btn.disabled = isLoading;
+        btn.classList.toggle('loading', isLoading);
+        btn.textContent = isLoading ? 'Updating...' : btn.dataset.originalText;
+    }
+
+    function showToast(type, title, message) {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        `;
+
+        container.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('show'));
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 200);
+        }, 2800);
+    }
+
+    // DELETE APPLICATION FUNCTION
+async function deleteApplication(appId) {
+    openDeleteModal(appId);
+}
+
+async function confirmDeleteApplication() {
+    if (!deleteTargetAppId) return;
+    const appId = deleteTargetAppId;
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const oldText = confirmBtn ? confirmBtn.textContent : 'Delete';
+
+    try {
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Deleting...';
+        }
+
+        const response = await 	fetch("/api/onboarding/delete-application",
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    action: "delete",       
+                    application_id: appId   
+                })
+            }
+        );
+
+        const result = await response.json();
+        console.log("DELETE RESULT:", result);
+
+        if (!response.ok) {
+            throw new Error(result.message || "Failed to delete application");
+        }
+
+        closeDeleteModal();
+        showToast('success', 'Deleted', 'Application deleted successfully.');
+        loadApplications();
+
+    } catch (error) {
+        showToast('error', 'Delete Failed', error.message || 'Unable to delete application.');
+    } finally {
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = oldText;
+        }
+    }
+}
+
+    // UPDATE STATUS FUNCTION
+    async function updateStatus() {
+        const appId = document.getElementById('modalAppId').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const notes = document.getElementById('statusNotes').value;
+
+        if (!newStatus) {
+            showToast('error', 'Status Required', 'Please select a status before updating.');
+            return;
+        }
+
+        try {
+            setUpdateButtonLoading(true);
+            const response = await fetch('/api/onboarding/update-status',
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        application_id: appId,
+                        status: newStatus,
+                        admin_username: 'ADMIN',
+                        notes: notes
+                    })
+                }
+            );
+
+            if (!response.ok) throw new Error('Failed to update status');
+
+            showToast('success', 'Status Updated', 'Application status was updated successfully.');
+            closeModal();
+            loadApplications();
+
+        } catch (error) {
+            showToast('error', 'Update Failed', error.message || 'Unable to update status.');
+        } finally {
+            setUpdateButtonLoading(false);
+        }
+    }
+
+    function viewApplication(appId) {
+        window.open(`/track-application?id=${appId}`, '_blank');
+    }
+
+    // Close modal if clicked outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('updateModal');
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        if (event.target === modal) closeModal();
+        if (event.target === deleteModal) closeDeleteModal();
+    };
+    //Download resume-------------------------------------
+    function downloadResume(applicationId) {
+    console.log("Downloading resume for", applicationId);
+
+    const url = `/api/onboarding/download-resume/${encodeURIComponent(applicationId)}`;
+
+    // Create a hidden <a> tag with automatic download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = "";  // tells browser: "download whatever comes back"
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+    </script>
+
+</body>
+</html>
